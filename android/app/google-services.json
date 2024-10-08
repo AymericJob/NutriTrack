@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1023518605937",
+    "project_id": "myfitnesspal-6fa14",
+    "storage_bucket": "myfitnesspal-6fa14.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023518605937:android:33931df7a0eaf2a9d6d1d0",
+        "android_client_info": {
+          "package_name": "com.example.myfitnesspal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8KUSCX_xxfl8mrceq8p_WcylyCTHukP0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
