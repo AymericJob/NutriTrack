@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';  // Importation de Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart'; // Importer Firebase Auth
 import '../routes/app_routes.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Fonction pour la connexion
-  void _login(BuildContext context) async {
+  Future<void> _login(BuildContext context) async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
     try {
-      // Connexion via Firebase Auth
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      // Connexion avec Firebase
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      // Redirection vers la page d'accueil après connexion réussie
-      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+      // Redirection vers la page principale après connexion réussie
+      Navigator.of(context).pushReplacementNamed(AppRoutes.mainPage);
     } catch (e) {
-      // Afficher un message d'erreur en cas de problème
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to sign in: $e")),
-      );
+      // Afficher un message d'erreur
+      _showMessage(context, 'Login failed: ${e.toString()}');
     }
+  }
+
+  // Fonction pour afficher les messages
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -56,6 +57,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 40),
+                // Champ email
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -68,6 +70,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
+                // Champ mot de passe
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
@@ -81,6 +84,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 40),
+                // Bouton "Sign In"
                 ElevatedButton(
                   onPressed: () => _login(context),
                   style: ElevatedButton.styleFrom(
@@ -100,6 +104,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
+                // Bouton de redirection vers Sign Up
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pushNamed(AppRoutes.register);

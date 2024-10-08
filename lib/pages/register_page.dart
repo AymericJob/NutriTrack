@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';  // Importation de Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart'; // Importer Firebase Auth
 import '../routes/app_routes.dart';
 
 class RegisterPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Fonction pour l'inscription
-  void _register(BuildContext context) async {
+  Future<void> _register(BuildContext context) async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
     String confirmPassword = _confirmPasswordController.text.trim();
@@ -20,17 +19,16 @@ class RegisterPage extends StatelessWidget {
     }
 
     try {
-      // Inscription via Firebase Auth
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      // Inscription avec Firebase
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      // Redirection vers la page d'accueil après inscription réussie
-      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+      // Redirection vers la page principale après inscription réussie
+      Navigator.of(context).pushReplacementNamed(AppRoutes.mainPage);
     } catch (e) {
-      // Afficher un message d'erreur en cas de problème
-      _showMessage(context, "Failed to register: $e");
+      // Afficher un message d'erreur
+      _showMessage(context, 'Registration failed: ${e.toString()}');
     }
   }
 
@@ -66,6 +64,7 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 40),
+                // Champ email
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -78,6 +77,7 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
+                // Champ mot de passe
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
@@ -91,6 +91,7 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
+                // Champ confirmation du mot de passe
                 TextField(
                   controller: _confirmPasswordController,
                   obscureText: true,
@@ -104,6 +105,7 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 40),
+                // Bouton "Sign Up"
                 ElevatedButton(
                   onPressed: () => _register(context),
                   style: ElevatedButton.styleFrom(
@@ -123,6 +125,7 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
+                // Bouton de redirection vers Sign In
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pushNamed(AppRoutes.login);
