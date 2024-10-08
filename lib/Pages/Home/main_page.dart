@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../Home/dashboard_page.dart';  // Le tableau de bord principal
-import '../Home/activity_page.dart';   // La page des activités
-import '../Home/profile_page.dart';    // La page de profil
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase pour la déconnexion
+import 'dashboard_page.dart';  // Le tableau de bord principal
+import 'activity_page.dart';   // La page des activités
+import 'profile_page.dart';    // La page de profil
 
 class MainPage extends StatefulWidget {
   @override
@@ -26,41 +26,134 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  // Fonction pour déconnecter l'utilisateur
-  void _logout() async {
-    await FirebaseAuth.instance.signOut();
-    // La déconnexion redirigera automatiquement vers LoginPage
+  // Fonction de déconnexion avec une boîte de confirmation
+  Future<void> _signOut(BuildContext context) async {
+    bool confirmSignOut = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Sign Out'),
+          content: Text('Are you sure you want to sign out?'),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(false); // Ne pas déconnecter
+              },
+            ),
+            TextButton(
+              child: Text('Sign Out'),
+              onPressed: () {
+                Navigator.of(context).pop(true); // Confirmer la déconnexion
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmSignOut) {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).pushReplacementNamed('/login'); // Rediriger vers la page de login
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // AppBar pour le titre de l'application
       appBar: AppBar(
-        title: Text('My Fitness Pal'),
+        title: Text('MyFitnessPal'),
         backgroundColor: Colors.blue.shade700,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: _logout,
-            tooltip: 'Logout',
-          ),
-        ],
       ),
+
+      // Drawer (Menu latéral) avec des options
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue.shade700,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'MyFitnessPal',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Welcome, ${FirebaseAuth.instance.currentUser?.email ?? 'User'}',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+              onTap: () {
+                // Ouvrir la page de paramètres si elle existe
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.exit_to_app),
+              title: Text('Sign Out'),
+              onTap: () => _signOut(context),
+            ),
+          ],
+        ),
+      ),
+
       body: _pages[_selectedIndex], // Affiche la page selon l'onglet sélectionné
-      // Barre de navigation inférieure
+
+      // Barre de navigation inférieure améliorée
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         backgroundColor: Colors.blue.shade700,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white54,
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center),
+            icon: Stack(
+              children: [
+                Icon(Icons.fitness_center),
+                Positioned(
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 12,
+                      minHeight: 12,
+                    ),
+                    child: Text(
+                      '3', // Exemple de badge (nombre de nouvelles activités)
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              ],
+            ),
             label: 'Activities',
           ),
           BottomNavigationBarItem(
