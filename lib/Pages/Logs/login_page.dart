@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Importer Firebase Auth
-import '../routes/app_routes.dart';
+import '../../../Routes/app_routes.dart'; // Corrigé le chemin d'importation
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   // Fonction pour la connexion
-  Future<void> _login(BuildContext context) async {
+  void _login(BuildContext context) async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
     try {
       // Connexion avec Firebase
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
       // Redirection vers la page principale après connexion réussie
       Navigator.of(context).pushReplacementNamed(AppRoutes.mainPage);
     } catch (e) {
-      // Afficher un message d'erreur
-      _showMessage(context, 'Login failed: ${e.toString()}');
+      _showMessage(context, "Login failed: $e");
     }
   }
 
@@ -107,7 +103,7 @@ class LoginPage extends StatelessWidget {
                 // Bouton de redirection vers Sign Up
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(AppRoutes.register);
+                    Navigator.of(context).pushNamed(AppRoutes.registerPage);
                   },
                   child: Text(
                     "Don't have an account? Sign Up",

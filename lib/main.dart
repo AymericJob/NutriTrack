@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'routes/app_routes.dart';
+import 'Routes/app_routes.dart'; // Corrigez l'importation
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Initialisation de Firebase
+void main() {
   runApp(MyApp());
 }
 
@@ -12,12 +9,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Bienvenue',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      initialRoute: AppRoutes.home,
+      title: 'My Fitness Pal',
+      initialRoute: AppRoutes.loginPage, // Utilisez la route correcte
       onGenerateRoute: AppRoutes.generateRoute,
     );
   }

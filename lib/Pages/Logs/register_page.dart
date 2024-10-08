@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Importer Firebase Auth
-import '../routes/app_routes.dart';
+import '../../../Routes/app_routes.dart'; // Corrigé le chemin d'importation
 
 class RegisterPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -8,7 +8,7 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController _confirmPasswordController = TextEditingController();
 
   // Fonction pour l'inscription
-  Future<void> _register(BuildContext context) async {
+  void _register(BuildContext context) async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
     String confirmPassword = _confirmPasswordController.text.trim();
@@ -20,15 +20,11 @@ class RegisterPage extends StatelessWidget {
 
     try {
       // Inscription avec Firebase
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
       // Redirection vers la page principale après inscription réussie
       Navigator.of(context).pushReplacementNamed(AppRoutes.mainPage);
     } catch (e) {
-      // Afficher un message d'erreur
-      _showMessage(context, 'Registration failed: ${e.toString()}');
+      _showMessage(context, "Registration failed: $e");
     }
   }
 
@@ -128,7 +124,7 @@ class RegisterPage extends StatelessWidget {
                 // Bouton de redirection vers Sign In
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(AppRoutes.login);
+                    Navigator.of(context).pushNamed(AppRoutes.loginPage);
                   },
                   child: Text(
                     'Already have an account? Sign In',
