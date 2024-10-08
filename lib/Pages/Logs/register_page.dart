@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Importer Firebase Auth
-import '../../../Routes/app_routes.dart'; // Corrigé le chemin d'importation
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../Routes/app_routes.dart';
 
 class RegisterPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+
+  // Fonction pour afficher les messages
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
 
   // Fonction pour l'inscription
   void _register(BuildContext context) async {
@@ -19,18 +24,15 @@ class RegisterPage extends StatelessWidget {
     }
 
     try {
-      // Inscription avec Firebase
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-      // Redirection vers la page principale après inscription réussie
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // Redirection vers MainPage
       Navigator.of(context).pushReplacementNamed(AppRoutes.mainPage);
     } catch (e) {
-      _showMessage(context, "Registration failed: $e");
+      _showMessage(context, 'Registration failed: ${e.toString()}');
     }
-  }
-
-  // Fonction pour afficher les messages
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

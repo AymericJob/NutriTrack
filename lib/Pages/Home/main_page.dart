@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-// Pages individuelles à importer
-import 'dashboard_page.dart';  // Le tableau de bord principal
-import 'activity_page.dart';   // La page des activités
-import 'profile_page.dart';    // La page de profil
+import '../Home/dashboard_page.dart';  // Le tableau de bord principal
+import '../Home/activity_page.dart';   // La page des activités
+import '../Home/profile_page.dart';    // La page de profil
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -27,13 +26,25 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  // Fonction pour déconnecter l'utilisateur
+  void _logout() async {
+    await FirebaseAuth.instance.signOut();
+    // La déconnexion redirigera automatiquement vers LoginPage
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar pour le titre de l'application
       appBar: AppBar(
         title: Text('My Fitness Pal'),
         backgroundColor: Colors.blue.shade700,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
       ),
       body: _pages[_selectedIndex], // Affiche la page selon l'onglet sélectionné
       // Barre de navigation inférieure

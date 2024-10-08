@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Importer Firebase Auth
-import '../../../Routes/app_routes.dart'; // Corrigé le chemin d'importation
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../Routes/app_routes.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  // Fonction pour afficher les messages
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
 
   // Fonction pour la connexion
   void _login(BuildContext context) async {
@@ -12,18 +17,15 @@ class LoginPage extends StatelessWidget {
     String password = _passwordController.text.trim();
 
     try {
-      // Connexion avec Firebase
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-      // Redirection vers la page principale après connexion réussie
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // Redirection vers MainPage
       Navigator.of(context).pushReplacementNamed(AppRoutes.mainPage);
     } catch (e) {
-      _showMessage(context, "Login failed: $e");
+      _showMessage(context, 'Login failed: ${e.toString()}');
     }
-  }
-
-  // Fonction pour afficher les messages
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
