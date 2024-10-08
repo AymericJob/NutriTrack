@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'routes/app_routes.dart'; // Importation des routes
+import 'package:firebase_core/firebase_core.dart';
+import 'routes/app_routes.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialisation de Firebase
   runApp(MyApp());
 }
 
@@ -14,8 +17,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: AppRoutes.home, // Route initiale
-      onGenerateRoute: AppRoutes.generateRoute, // Génération des routes
+      initialRoute: AppRoutes.home,
+      onGenerateRoute: AppRoutes.generateRoute,
     );
   }
 }
