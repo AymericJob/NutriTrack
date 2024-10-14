@@ -1,0 +1,10 @@
+//TODO
+Regarder pour intégrer la register page et autres... elles sont déja fait mais pas intégrer
+Regarder pour faire aussi le mot de passe oublié et les différents utilisateurs style invité et si invité alors on ne peux pas avsoir acces a tout
+Regarder pour scanner des vrai aliments
+Regarder pour faire une recherch d'aliment dans une base de donnée
+Regarder pour faire un systeme de favoris
+Regarder pour tenir un historique en fonction de chaque jours et de chaque utilisateur
+Regarder pour faire un systeme de notification
+Rgarder pour avoir ls différents repas de la journées.....
+.....
