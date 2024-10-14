@@ -1,17 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pedometer/pedometer.dart';
+import '../models/food.dart';
+import '../Models/add_food_page.dart';
+import 'package:intl/intl.dart'; // Pour manipuler les dates
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
+  @override
+  _DashboardPageState createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  List<Food> _foods = [];
+  int _stepsToday = 0; // Nombre de pas aujourd'hui
+  Stream<StepCount>? _stepCountStream;
+  DateTime _lastRecordedDate = DateTime.now(); // Date de la dernière mise à jour des pas
+
+  @override
+  void initState() {
+    super.initState();
+    _initPedometer();
+  }
+
+  void _initPedometer() {
+    // Écoute des changements de pas
+    _stepCountStream = Pedometer.stepCountStream;
+    _stepCountStream?.listen(
+          (StepCount stepCount) {
+        // Vérifiez si la date a changé
+        if (_lastRecordedDate.day != DateTime.now().day) {
+          // Réinitialisez le compteur de pas pour le nouveau jour
+          _stepsToday = 0;
+          _lastRecordedDate = DateTime.now();
+        }
+
+        // Ajoutez les pas à la journée actuelle
+        setState(() {
+          _stepsToday += stepCount.steps; // Mettez à jour le nombre de pas
+        });
+      },
+      onError: (error) {
+        print("Erreur lors de l'obtention des pas: $error");
+      },
+    );
+  }
+
+  void _addFood(Food food) {
+    setState(() {
+      _foods.add(food);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    int totalCalories = _foods.fold(0, (sum, food) => sum + food.calories);
+    int totalCarbs = _foods.fold(0, (sum, food) => sum + food.carbs);
+    int totalFat = _foods.fold(0, (sum, food) => sum + food.fat);
+    int totalProtein = _foods.fold(0, (sum, food) => sum + food.protein);
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Mon Dashboard'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddFoodPage(onFoodAdded: _addFood),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // Permet le défilement si nécessaire
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Section des macros
               Text(
                 'Macros',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
@@ -20,50 +89,34 @@ class DashboardPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildMacroCard('Carbs', 50, 165, Colors.blue),
-                  _buildMacroCard('Fat', 35, 65, Colors.green),
-                  _buildMacroCard('Protein', 65, 85, Colors.orange),
+                  _buildMacroCard('Carbs', totalCarbs, 165, Colors.blue),
+                  _buildMacroCard('Fat', totalFat, 65, Colors.green),
+                  _buildMacroCard('Protein', totalProtein, 85, Colors.orange),
                 ],
               ),
               SizedBox(height: 20),
-              // Section des pas
               _buildStatsCard(
                 icon: FontAwesomeIcons.walking,
-                title: 'Pas: 6,342 / 10,000',
+                title: 'Pas aujourd\'hui: $_stepsToday / 10,000',
                 subtitle: 'Exercice: 400 cal, 1:01 hr',
               ),
-              // Section du poids
               _buildStatsCard(
                 icon: FontAwesomeIcons.weight,
-                title: 'Poids: XX kg', // Remplacez XX par le poids
-                onTap: () {
-                  // Action à définir
-                },
+                title: 'Poids: XX kg',
               ),
               SizedBox(height: 20),
-              // Liste pour les repas et les exercices
               _buildListTile(
                 icon: FontAwesomeIcons.utensils,
                 title: 'Repas d\'aujourd\'hui',
-                onTap: () {
-                  // Action à définir
-                },
               ),
               _buildListTile(
                 icon: FontAwesomeIcons.dumbbell,
                 title: 'Exercices d\'aujourd\'hui',
-                onTap: () {
-                  // Action à définir
-                },
               ),
               _buildListTile(
                 icon: FontAwesomeIcons.chartPie,
                 title: 'Statistiques',
-                onTap: () {
-                  // Action à définir
-                },
               ),
-              // Ajoutez d'autres ListTile ou widgets ici
             ],
           ),
         ),
@@ -95,7 +148,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsCard({required IconData icon, required String title, String? subtitle, void Function()? onTap}) {
+  Widget _buildStatsCard({required IconData icon, required String title, String? subtitle}) {
     return Card(
       elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -103,20 +156,25 @@ class DashboardPage extends StatelessWidget {
         leading: Icon(icon, size: 30, color: Colors.teal),
         title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
         subtitle: subtitle != null ? Text(subtitle) : null,
-        onTap: onTap,
       ),
     );
   }
 
-  Widget _buildListTile({required IconData icon, required String title, required void Function()? onTap}) {
+  Widget _buildListTile({required IconData icon, required String title}) {
     return Card(
       elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 10),
       child: ListTile(
         leading: Icon(icon, size: 30, color: Colors.teal),
         title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-        onTap: onTap,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Annulez l'écouteur lors de la fermeture
+    _stepCountStream?.listen((_) {}).cancel();
+    super.dispose();
   }
 }
