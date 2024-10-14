@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dashboard_page.dart';
 import 'activity_page.dart';
-import 'profile_page.dart';
+import 'Profile/profile_page.dart';
 
 class MainPage extends StatefulWidget {
   @override
