@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
 import '../models/food.dart';
 import '../Models/add_food_page.dart';
-import 'package:intl/intl.dart'; // Pour manipuler les dates
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -12,37 +13,63 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   List<Food> _foods = [];
-  int _stepsToday = 0; // Nombre de pas aujourd'hui
+  int _stepsToday = 0;
   Stream<StepCount>? _stepCountStream;
-  DateTime _lastRecordedDate = DateTime.now(); // Date de la dernière mise à jour des pas
+  DateTime _lastRecordedDate = DateTime.now();
+
+  // Variables pour stocker les objectifs nutritionnels récupérés de Firestore
+  int _calorieGoal = 0;
+  int _carbsGoal = 0;
+  int _proteinGoal = 0;
+  int _fatGoal = 0;
 
   @override
   void initState() {
     super.initState();
     _initPedometer();
+    _fetchNutritionGoals(); // Récupérer les objectifs nutritionnels depuis Firestore
   }
 
   void _initPedometer() {
-    // Écoute des changements de pas
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream?.listen(
           (StepCount stepCount) {
-        // Vérifiez si la date a changé
         if (_lastRecordedDate.day != DateTime.now().day) {
-          // Réinitialisez le compteur de pas pour le nouveau jour
           _stepsToday = 0;
           _lastRecordedDate = DateTime.now();
         }
-
-        // Ajoutez les pas à la journée actuelle
         setState(() {
-          _stepsToday += stepCount.steps; // Mettez à jour le nombre de pas
+          _stepsToday += stepCount.steps;
         });
       },
       onError: (error) {
         print("Erreur lors de l'obtention des pas: $error");
       },
     );
+  }
+
+  // Fonction pour récupérer les objectifs nutritionnels depuis Firestore
+  Future<void> _fetchNutritionGoals() async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid; // Récupérer l'UID de l'utilisateur connecté
+    if (uid != null) {
+      try {
+        DocumentSnapshot doc = await FirebaseFirestore.instance.collection('nutrition_goals').doc(uid).get();
+        if (doc.exists) {
+          setState(() {
+            _calorieGoal = doc['calories'] ?? 0;
+            _carbsGoal = doc['carbs'] ?? 0;
+            _proteinGoal = doc['protein'] ?? 0;
+            _fatGoal = doc['fat'] ?? 0;
+          });
+        } else {
+          print("Aucun objectif trouvé pour cet utilisateur.");
+        }
+      } catch (e) {
+        print("Erreur lors de la récupération des objectifs de nutrition: $e");
+      }
+    } else {
+      print("Utilisateur non connecté.");
+    }
   }
 
   void _addFood(Food food) {
@@ -53,6 +80,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculer les macros actuelles consommées
     int totalCalories = _foods.fold(0, (sum, food) => sum + food.calories);
     int totalCarbs = _foods.fold(0, (sum, food) => sum + food.carbs);
     int totalFat = _foods.fold(0, (sum, food) => sum + food.fat);
@@ -60,7 +88,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mon Dashboard'),
+        title: Text('Dashboard'),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
@@ -89,33 +117,33 @@ class _DashboardPageState extends State<DashboardPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildMacroCard('Carbs', totalCarbs, 165, Colors.blue),
-                  _buildMacroCard('Fat', totalFat, 65, Colors.green),
-                  _buildMacroCard('Protein', totalProtein, 85, Colors.orange),
+                  _buildMacroCard('Carbs', totalCarbs, _carbsGoal, Colors.blue),
+                  _buildMacroCard('Fat', totalFat, _fatGoal, Colors.green),
+                  _buildMacroCard('Protein', totalProtein, _proteinGoal, Colors.orange),
                 ],
               ),
               SizedBox(height: 20),
               _buildStatsCard(
                 icon: FontAwesomeIcons.walking,
-                title: 'Pas aujourd\'hui: $_stepsToday / 10,000',
-                subtitle: 'Exercice: 400 cal, 1:01 hr',
+                title: 'Steps Today: $_stepsToday / 10,000',
+                subtitle: 'Exercise: 400 cal, 1:01 hr',
               ),
               _buildStatsCard(
                 icon: FontAwesomeIcons.weight,
-                title: 'Poids: XX kg',
+                title: 'Weight: XX kg',
               ),
               SizedBox(height: 20),
               _buildListTile(
                 icon: FontAwesomeIcons.utensils,
-                title: 'Repas d\'aujourd\'hui',
+                title: 'Today\'s Meals',
               ),
               _buildListTile(
                 icon: FontAwesomeIcons.dumbbell,
-                title: 'Exercices d\'aujourd\'hui',
+                title: 'Today\'s Exercises',
               ),
               _buildListTile(
                 icon: FontAwesomeIcons.chartPie,
-                title: 'Statistiques',
+                title: 'Statistics',
               ),
             ],
           ),
@@ -173,7 +201,6 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   void dispose() {
-    // Annulez l'écouteur lors de la fermeture
     _stepCountStream?.listen((_) {}).cancel();
     super.dispose();
   }
