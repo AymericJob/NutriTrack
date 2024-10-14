@@ -9,15 +9,18 @@ class ProfilePage extends StatelessWidget {
         children: [
           Text(
             'Your Profile',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: _pageTitleStyle,
           ),
           SizedBox(height: 20),
           Text(
             'Edit your personal information, view achievements, etc.',
-            style: TextStyle(fontSize: 16),
+            style: _pageSubtitleStyle,
           ),
         ],
       ),
     );
   }
+
+  TextStyle get _pageTitleStyle => TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
+  TextStyle get _pageSubtitleStyle => TextStyle(fontSize: 16);
 }

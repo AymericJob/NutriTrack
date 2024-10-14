@@ -4,8 +4,9 @@ import '../Pages/Logs/register_page.dart';
 import '../Pages/Home/main_page.dart';
 
 class AppRoutes {
+  static const String homePage = '/';
   static const String loginPage = '/login';
-  static const String registerPage = '/register';
+  static const String registerPage = '/register'; // Ajoutez cette ligne
   static const String mainPage = '/main';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
