@@ -4,4 +4,13 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_HEALTH_DATA" />
+    <uses-permission android:name="android.permission.WRITE_HEALTH_DATA" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" /> <!-- For health data -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+
 </manifest>

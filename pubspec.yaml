@@ -40,7 +40,10 @@ dependencies:
   cloud_firestore: ^5.4.3
   fl_chart: ^0.40.0
   font_awesome_flutter: ^10.1.0
-
+  barcode_scan2: ^4.0.0
+  pedometer: ^4.0.2
+  permission_handler: ^11.2.0
+  intl: ^0.17.0
 
 
 dev_dependencies:
