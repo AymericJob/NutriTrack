@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/food.dart';
 import '../Models/add_food_page.dart';
 
@@ -23,6 +23,9 @@ class _DashboardPageState extends State<DashboardPage> {
   int _proteinGoal = 0;
   int _fatGoal = 0;
 
+  PageController _pageController =
+      PageController(); // Pour gérer le changement de page
+
   @override
   void initState() {
     super.initState();
@@ -33,7 +36,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void _initPedometer() {
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream?.listen(
-          (StepCount stepCount) {
+      (StepCount stepCount) {
         if (_lastRecordedDate.day != DateTime.now().day) {
           _stepsToday = 0;
           _lastRecordedDate = DateTime.now();
@@ -50,10 +53,14 @@ class _DashboardPageState extends State<DashboardPage> {
 
   // Fonction pour récupérer les objectifs nutritionnels depuis Firestore
   Future<void> _fetchNutritionGoals() async {
-    String? uid = FirebaseAuth.instance.currentUser?.uid; // Récupérer l'UID de l'utilisateur connecté
+    String? uid = FirebaseAuth
+        .instance.currentUser?.uid; // Récupérer l'UID de l'utilisateur connecté
     if (uid != null) {
       try {
-        DocumentSnapshot doc = await FirebaseFirestore.instance.collection('nutrition_goals').doc(uid).get();
+        DocumentSnapshot doc = await FirebaseFirestore.instance
+            .collection('nutrition_goals')
+            .doc(uid)
+            .get();
         if (doc.exists) {
           setState(() {
             _calorieGoal = doc['calories'] ?? 0;
@@ -89,64 +96,72 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddFoodPage(onFoodAdded: _addFood),
-                ),
-              );
-            },
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Macros',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Macros',
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87),
+            ),
+            SizedBox(height: 10),
+            // PageView pour afficher les macros
+            Container(
+              height: 150, // Hauteur du conteneur de macros
+              child: PageView(
+                controller: _pageController,
                 children: [
+                  _buildMacroCard(
+                      'Calories', totalCalories, _calorieGoal, Colors.red),
                   _buildMacroCard('Carbs', totalCarbs, _carbsGoal, Colors.blue),
                   _buildMacroCard('Fat', totalFat, _fatGoal, Colors.green),
-                  _buildMacroCard('Protein', totalProtein, _proteinGoal, Colors.orange),
+                  _buildMacroCard(
+                      'Protein', totalProtein, _proteinGoal, Colors.orange),
                 ],
               ),
-              SizedBox(height: 20),
-              _buildStatsCard(
-                icon: FontAwesomeIcons.walking,
-                title: 'Steps Today: $_stepsToday / 10,000',
-                subtitle: 'Exercise: 400 cal, 1:01 hr',
+            ),
+            SizedBox(height: 20),
+            _buildStatsCard(
+              icon: FontAwesomeIcons.walking,
+              title: 'Steps Today: $_stepsToday / 10,000',
+              subtitle: 'Exercise: 400 cal, 1:01 hr',
+            ),
+            _buildStatsCard(
+              icon: FontAwesomeIcons.weight,
+              title: 'Weight: XX kg',
+            ),
+            SizedBox(height: 20),
+            _buildListTile(
+              icon: FontAwesomeIcons.utensils,
+              title: 'Today\'s Meals',
+            ),
+            _buildListTile(
+              icon: FontAwesomeIcons.dumbbell,
+              title: 'Today\'s Exercises',
+            ),
+            _buildListTile(
+              icon: FontAwesomeIcons.chartPie,
+              title: 'Statistics',
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddFoodPage(onFoodAdded: _addFood),
+                    ),
+                  );
+                },
+                child: Text('Ajouter un Aliment'),
               ),
-              _buildStatsCard(
-                icon: FontAwesomeIcons.weight,
-                title: 'Weight: XX kg',
-              ),
-              SizedBox(height: 20),
-              _buildListTile(
-                icon: FontAwesomeIcons.utensils,
-                title: 'Today\'s Meals',
-              ),
-              _buildListTile(
-                icon: FontAwesomeIcons.dumbbell,
-                title: 'Today\'s Exercises',
-              ),
-              _buildListTile(
-                icon: FontAwesomeIcons.chartPie,
-                title: 'Statistics',
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -164,19 +179,22 @@ class _DashboardPageState extends State<DashboardPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            '$value / $goal g',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+            '$value / $goal ${label == 'Calories' ? 'kcal' : 'g'}',
+            style: TextStyle(
+                fontSize: 24, fontWeight: FontWeight.bold, color: color),
           ),
+          SizedBox(height: 10),
           Text(
             label,
-            style: TextStyle(color: color),
+            style: TextStyle(fontSize: 18, color: color),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatsCard({required IconData icon, required String title, String? subtitle}) {
+  Widget _buildStatsCard(
+      {required IconData icon, required String title, String? subtitle}) {
     return Card(
       elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 10),
