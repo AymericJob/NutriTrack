@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../Pages/Logs/login_page.dart';
 import '../Pages/Logs/register_page.dart';
 import '../Pages/Home/main_page.dart';
-
+import '../Pages/Logs/home_page.dart'; // Importer HomePage
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Assurez-vous que les widgets sont initialisés
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.active) {
             // Si l'utilisateur est connecté, aller à MainPage, sinon aller à LoginPage
-            return snapshot.hasData ? MainPage() : LoginPage();
+            return snapshot.hasData ? MainPage() : HomePage();
           }
           return Center(child: CircularProgressIndicator()); // Afficher un indicateur de chargement pendant le chargement
         },

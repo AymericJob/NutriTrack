@@ -48,93 +48,109 @@ class RegisterPage extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Sign Up',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 40),
-                // Champ email
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                // Champ mot de passe
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                // Champ confirmation du mot de passe
-                TextField(
-                  controller: _confirmPasswordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 40),
-                // Bouton "Sign Up"
-                ElevatedButton(
-                  onPressed: () => _register(context),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.blue.shade700,
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                  ),
-                  child: Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                // Bouton de redirection vers Sign In
-                TextButton(
+          child: Stack(
+            children: [
+              // Flèche pour revenir à la page d'accueil
+              Positioned(
+                top: 16,
+                left: 16,
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back, color: Colors.white, size: 30), // Flèche blanche
                   onPressed: () {
-                    Navigator.of(context).pushNamed(AppRoutes.loginPage);
+                    Navigator.of(context).pushReplacementNamed('/homepage'); // Remplacez '/homepage' par le nom de votre route home_page.
                   },
-                  child: Text(
-                    'Already have an account? Sign In',
-                    style: TextStyle(color: Colors.white),
-                  ),
                 ),
-              ],
-            ),
+              ),
+              // Contenu principal de la page
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 40),
+                    // Champ email
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    // Champ mot de passe
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    // Champ confirmation du mot de passe
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 40),
+                    // Bouton "Sign Up"
+                    ElevatedButton(
+                      onPressed: () => _register(context),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.blue.shade700,
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                      ),
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    // Bouton de redirection vers Sign In
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(AppRoutes.loginPage);
+                      },
+                      child: Text(
+                        'Already have an account? Sign In',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
