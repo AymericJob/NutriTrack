@@ -44,6 +44,7 @@ dependencies:
   pedometer: ^4.0.2
   permission_handler: ^11.2.0
   intl: ^0.17.0
+  http: ^1.2.2
 
 
 dev_dependencies:
