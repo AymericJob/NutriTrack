@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:barcode_scan2/barcode_scan2.dart'; // Ajouté pour scanner le code-barres
+import 'package:http/http.dart' as http;
+import 'package:barcode_scan2/barcode_scan2.dart'; // Pour scanner le code-barres
 import '../models/food.dart';
 
 class AddFoodPage extends StatefulWidget {
@@ -18,21 +20,71 @@ class _AddFoodPageState extends State<AddFoodPage> {
   final TextEditingController _carbsController = TextEditingController();
   final TextEditingController _fatController = TextEditingController();
   final TextEditingController _proteinController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+
+  List<Food> _searchResults = [];
 
   // Nouvelle méthode pour scanner le code-barres
   Future<void> _scanBarcode() async {
     try {
       final result = await BarcodeScanner.scan();
       if (result.type == ResultType.Barcode) {
-        // Utilisez le code-barres scanné ici
-        // Exemple : Rechercher les informations de l'aliment en fonction du code-barres
-        // Ici, nous allons simplement l'afficher dans le champ de nom
-        setState(() {
-          _nameController.text = result.rawContent; // Si le code-barres est le nom de l'aliment
-        });
+        String barcode = result.rawContent;
+        await _fetchProductByBarcode(barcode);
       }
     } catch (e) {
       print('Erreur lors du scan : $e');
+    }
+  }
+
+  // Méthode pour récupérer les informations du produit via le code-barres
+  Future<void> _fetchProductByBarcode(String barcode) async {
+    final url = Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['status'] == 1) {
+        final product = data['product'];
+        setState(() {
+          _nameController.text = product['product_name'] ?? 'Nom inconnu';
+          _caloriesController.text = (product['nutriments']['energy-kcal_100g'] ?? 0).toString();
+          _carbsController.text = (product['nutriments']['carbohydrates_100g'] ?? 0).toString();
+          _fatController.text = (product['nutriments']['fat_100g'] ?? 0).toString();
+          _proteinController.text = (product['nutriments']['proteins_100g'] ?? 0).toString();
+        });
+      } else {
+        print('Produit non trouvé');
+      }
+    } else {
+      print('Erreur lors de la récupération du produit : ${response.statusCode}');
+    }
+  }
+
+  // Méthode pour rechercher les aliments via des mots-clés
+  Future<void> _searchFood(String query) async {
+    if (query.isEmpty) return;
+
+    final url = Uri.parse('https://world.openfoodfacts.org/cgi/search.pl?action=process&search_terms=$query&json=1');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> products = data['products'];
+
+      setState(() {
+        _searchResults = products.map((item) {
+          return Food(
+            name: item['product_name'] ?? 'Nom inconnu',
+            calories: (item['nutriments']['energy-kcal_100g'] ?? 0).toInt(),
+            carbs: (item['nutriments']['carbohydrates_100g'] ?? 0).toInt(),
+            fat: (item['nutriments']['fat_100g'] ?? 0).toInt(),
+            protein: (item['nutriments']['proteins_100g'] ?? 0).toInt(),
+          );
+        }).toList();
+      });
+    } else {
+      print('Erreur lors de la recherche des aliments : ${response.statusCode}');
     }
   }
 
@@ -81,20 +133,34 @@ class _AddFoodPageState extends State<AddFoodPage> {
                 _buildTextField(_proteinController, 'Protéines (g)', Icons.fitness_center),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _scanBarcode, // Ouvrir la caméra pour scanner le code-barres
+                  onPressed: _scanBarcode,
                   child: Text('Scanner un Code-Barres'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal, // Couleur du bouton
+                    backgroundColor: Colors.teal,
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     textStyle: TextStyle(fontSize: 18),
                   ),
                 ),
                 SizedBox(height: 20),
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    labelText: 'Rechercher un aliment',
+                    prefixIcon: Icon(Icons.search, color: Colors.teal),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onSubmitted: (query) => _searchFood(query),
+                ),
+                SizedBox(height: 10),
+                _buildSearchResults(),
+                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _submit,
                   child: Text('Ajouter l\'aliment'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal, // Couleur du bouton
+                    backgroundColor: Colors.teal,
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     textStyle: TextStyle(fontSize: 18),
                   ),
@@ -118,7 +184,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
           prefixIcon: Icon(icon, color: Colors.teal),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: Colors.teal),
           ),
         ),
         keyboardType: TextInputType.number,
@@ -129,6 +194,30 @@ class _AddFoodPageState extends State<AddFoodPage> {
           return null;
         },
       ),
+    );
+  }
+
+  // Affichage des résultats de recherche
+  Widget _buildSearchResults() {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: _searchResults.length,
+      itemBuilder: (context, index) {
+        final food = _searchResults[index];
+        return ListTile(
+          title: Text(food.name),
+          subtitle: Text('Calories: ${food.calories} kcal, Glucides: ${food.carbs}g, Lipides: ${food.fat}g, Protéines: ${food.protein}g'),
+          onTap: () {
+            setState(() {
+              _nameController.text = food.name;
+              _caloriesController.text = food.calories.toString();
+              _carbsController.text = food.carbs.toString();
+              _fatController.text = food.fat.toString();
+              _proteinController.text = food.protein.toString();
+            });
+          },
+        );
+      },
     );
   }
 }

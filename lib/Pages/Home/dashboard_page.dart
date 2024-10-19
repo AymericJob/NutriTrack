@@ -24,7 +24,7 @@ class _DashboardPageState extends State<DashboardPage> {
   int _fatGoal = 0;
 
   PageController _pageController =
-      PageController(); // Pour gérer le changement de page
+  PageController(); // Pour gérer le changement de page
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void _initPedometer() {
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream?.listen(
-      (StepCount stepCount) {
+          (StepCount stepCount) {
         if (_lastRecordedDate.day != DateTime.now().day) {
           _stepsToday = 0;
           _lastRecordedDate = DateTime.now();
@@ -96,6 +96,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
+        automaticallyImplyLeading: false,  // Ajoutez cette ligne pour supprimer la flèche
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -139,10 +140,6 @@ class _DashboardPageState extends State<DashboardPage> {
             _buildListTile(
               icon: FontAwesomeIcons.utensils,
               title: 'Today\'s Meals',
-            ),
-            _buildListTile(
-              icon: FontAwesomeIcons.dumbbell,
-              title: 'Today\'s Exercises',
             ),
             _buildListTile(
               icon: FontAwesomeIcons.chartPie,

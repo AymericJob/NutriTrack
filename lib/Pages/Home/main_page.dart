@@ -27,7 +27,7 @@ class _MainPageState extends State<MainPage> {
     final confirmSignOut = await _showSignOutDialog(context);
     if (confirmSignOut) {
       await FirebaseAuth.instance.signOut();
-      Navigator.of(context).pushReplacementNamed('/login');
+      Navigator.of(context).pushReplacementNamed('/homepage');
     }
   }
 
@@ -36,15 +36,15 @@ class _MainPageState extends State<MainPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Sign Out'),
-          content: Text('Are you sure you want to sign out?'),
+          title: Text('Déconnexion', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
           actions: [
             TextButton(
-              child: Text('Cancel'),
+              child: Text('Annuler', style: TextStyle(color: Colors.blue)),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             TextButton(
-              child: Text('Sign Out'),
+              child: Text('Déconnexion', style: TextStyle(color: Colors.red)),
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
@@ -58,10 +58,20 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('MyFitnessPal'),
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor: Colors.blueAccent,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              // Action pour les notifications
+            },
+          ),
+        ],
       ),
       drawer: _buildDrawer(context),
-      body: _pages[_selectedIndex],
+      body: SafeArea(
+        child: _pages[_selectedIndex],
+      ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
@@ -72,27 +82,34 @@ class _MainPageState extends State<MainPage> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue.shade700),
+            decoration: BoxDecoration(color: Colors.blueAccent),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('MyFitnessPal', style: TextStyle(color: Colors.white, fontSize: 24)),
+                Text('MyFitnessPal', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
-                Text('Welcome, ${FirebaseAuth.instance.currentUser?.email ?? 'User'}',
+                Text('Bienvenue, ${FirebaseAuth.instance.currentUser?.email ?? 'Utilisateur'}',
                     style: TextStyle(color: Colors.white70, fontSize: 16)),
               ],
             ),
           ),
           ListTile(
             leading: Icon(Icons.settings),
-            title: Text('Settings'),
+            title: Text('Paramètres'),
             onTap: () {
-              // Open settings page if it exists
+              Navigator.of(context).pushNamed('/settings'); // Assurez-vous que cette route est définie
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text('À propos'),
+            onTap: () {
+              // Action pour ouvrir la page À propos
             },
           ),
           ListTile(
             leading: Icon(Icons.exit_to_app),
-            title: Text('Sign Out'),
+            title: Text('Déconnexion'),
             onTap: () => _signOut(context),
           ),
         ],
@@ -104,7 +121,7 @@ class _MainPageState extends State<MainPage> {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
       onTap: _onItemTapped,
-      backgroundColor: Colors.blue.shade700,
+      backgroundColor: Colors.blueAccent,
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.white54,
       items: [
@@ -124,9 +141,9 @@ class _MainPageState extends State<MainPage> {
               ),
             ],
           ),
-          label: 'Activities',
+          label: 'Activités',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
       ],
     );
   }

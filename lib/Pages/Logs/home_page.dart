@@ -25,7 +25,11 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 40),
               Text(
                 "Bienvenue dans l'App",
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
               SizedBox(height: 20),
               ElevatedButton(
@@ -40,7 +44,28 @@ class HomePage extends StatelessWidget {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                 ),
-                child: Text('Get Started', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Login',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.registerPage);
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.blue.shade700,
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                ),
+                child: Text(
+                  'Register',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
