@@ -23,9 +23,6 @@ class _DashboardPageState extends State<DashboardPage> {
   int _proteinGoal = 0;
   int _fatGoal = 0;
 
-  PageController _pageController =
-  PageController(); // Pour gérer le changement de page
-
   @override
   void initState() {
     super.initState();
@@ -53,8 +50,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   // Fonction pour récupérer les objectifs nutritionnels depuis Firestore
   Future<void> _fetchNutritionGoals() async {
-    String? uid = FirebaseAuth
-        .instance.currentUser?.uid; // Récupérer l'UID de l'utilisateur connecté
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       try {
         DocumentSnapshot doc = await FirebaseFirestore.instance
@@ -96,7 +92,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
-        automaticallyImplyLeading: false,  // Ajoutez cette ligne pour supprimer la flèche
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -106,24 +102,35 @@ class _DashboardPageState extends State<DashboardPage> {
             Text(
               'Macros',
               style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
             SizedBox(height: 10),
-            // PageView pour afficher les macros
-            Container(
-              height: 150, // Hauteur du conteneur de macros
-              child: PageView(
-                controller: _pageController,
-                children: [
-                  _buildMacroCard(
-                      'Calories', totalCalories, _calorieGoal, Colors.red),
-                  _buildMacroCard('Carbs', totalCarbs, _carbsGoal, Colors.blue),
-                  _buildMacroCard('Fat', totalFat, _fatGoal, Colors.green),
-                  _buildMacroCard(
-                      'Protein', totalProtein, _proteinGoal, Colors.orange),
-                ],
+            // Organiser les indicateurs circulaires en ligne (Row)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildCircularProgressIndicator('Calories', totalCalories, _calorieGoal, Colors.red),
+                _buildCircularProgressIndicator('Carbs', totalCarbs, _carbsGoal, Colors.blue),
+                _buildCircularProgressIndicator('Fat', totalFat, _fatGoal, Colors.green),
+                _buildCircularProgressIndicator('Protein', totalProtein, _proteinGoal, Colors.orange),
+              ],
+            ),
+            SizedBox(height: 20),
+            // Bouton Ajouter un Aliment sous les indicateurs
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddFoodPage(onFoodAdded: _addFood),
+                    ),
+                  );
+                },
+                child: Text('Ajouter un Aliment'),
               ),
             ),
             SizedBox(height: 20),
@@ -145,53 +152,54 @@ class _DashboardPageState extends State<DashboardPage> {
               icon: FontAwesomeIcons.chartPie,
               title: 'Statistics',
             ),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddFoodPage(onFoodAdded: _addFood),
-                    ),
-                  );
-                },
-                child: Text('Ajouter un Aliment'),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMacroCard(String label, int value, int goal, Color color) {
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        border: Border.all(color: color, width: 2),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '$value / $goal ${label == 'Calories' ? 'kcal' : 'g'}',
-            style: TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold, color: color),
+  Widget _buildCircularProgressIndicator(String label, int value, int goal, Color color) {
+    double progress = (goal > 0) ? value / goal : 0;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Le cercle avec la progression
+        SizedBox(
+          height: 100,
+          width: 100,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CircularProgressIndicator(
+                value: progress,
+                strokeWidth: 10,
+                backgroundColor: color.withOpacity(0.2),
+                valueColor: AlwaysStoppedAnimation<Color>(color),
+              ),
+            ],
           ),
-          SizedBox(height: 10),
-          Text(
-            label,
-            style: TextStyle(fontSize: 18, color: color),
-          ),
-        ],
-      ),
+        ),
+        SizedBox(height: 10), // Espacement entre le cercle et le texte
+        // Valeur actuelle en dessous du cercle
+        Text(
+          '$value / $goal',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+        ),
+        SizedBox(height: 5), // Petit espacement entre les valeurs et le label
+        // Label du macro (Calories, Carbs, etc.)
+        Text(
+          label,
+          style: TextStyle(fontSize: 16, color: color),
+        ),
+      ],
     );
   }
 
-  Widget _buildStatsCard(
-      {required IconData icon, required String title, String? subtitle}) {
+
+
+
+  Widget _buildStatsCard({required IconData icon, required String title, String? subtitle}) {
     return Card(
       elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 10),

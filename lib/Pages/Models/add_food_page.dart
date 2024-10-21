@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:barcode_scan2/barcode_scan2.dart'; // Pour scanner le code-barres
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importation nécessaire pour Firestore
+import 'package:firebase_auth/firebase_auth.dart'; // Importation pour Firebase Auth
 import '../models/food.dart';
 
 class AddFoodPage extends StatefulWidget {
@@ -88,6 +90,46 @@ class _AddFoodPageState extends State<AddFoodPage> {
     }
   }
 
+  // Méthode pour enregistrer l'aliment dans Firestore
+  Future<void> _saveFoodToFirestore(Food food) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid; // Récupère l'ID de l'utilisateur connecté
+    if (userId == null) {
+      print('Utilisateur non connecté');
+      return;
+    }
+
+    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+
+    try {
+      await userRef.collection('foods').add({
+        'name': food.name,
+        'calories': food.calories,
+        'carbs': food.carbs,
+        'fat': food.fat,
+        'protein': food.protein,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      print('Aliment ajouté dans Firestore avec succès');
+      // Afficher un message de confirmation
+      _showSnackBar('Aliment ajouté avec succès !');
+    } catch (e) {
+      print('Erreur lors de l\'ajout de l\'aliment dans Firestore : $e');
+      // Afficher un message d'erreur
+      _showSnackBar('Erreur lors de l\'ajout de l\'aliment. Veuillez réessayer.');
+    }
+  }
+
+  // Afficher un SnackBar
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.teal,
+      ),
+    );
+  }
+
   void _submit() {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       final food = Food(
@@ -98,7 +140,11 @@ class _AddFoodPageState extends State<AddFoodPage> {
         protein: int.parse(_proteinController.text),
       );
 
-      widget.onFoodAdded(food);
+      widget.onFoodAdded(food); // Appel de la méthode pour mettre à jour l'affichage local
+
+      // Enregistrer l'aliment dans Firestore
+      _saveFoodToFirestore(food);
+
       Navigator.pop(context);
     }
   }

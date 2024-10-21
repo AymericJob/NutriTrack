@@ -13,3 +13,7 @@ Rgarder pour avoir ls différents repas de la journées.....
 
 !!Regarder!!
 Ce que je sauvegarde dans firestore n'est pas persistant, il faut que je regarde pourquoi
+Regarder pour faie une barre de recherche tout en bas avc l'icone de recherche pour le bar code aussi rerpis dans la barre de recherche
+-->Un peu a la myfitnesspas mais de manière revistée.....
+
+Problème a traiter... je prends bien en compte les aliments et je les ai bien dans firestoire mais si je me déco-reco, je ne fait pas de recherche dans firestore pour les récupérer
