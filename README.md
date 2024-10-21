@@ -1,16 +1,89 @@
-# myfitnesspal
+# MyFitnessPal
 
-A new Flutter project.
+MyFitnessPal est une application Flutter conçue pour aider les utilisateurs à gérer leur alimentation et leur santé de manière simple et efficace.
 
-## Getting Started
+## 🔍 Aperçu de notre application
 
-This project is a starting point for a Flutter application.
+L'application MyFitnessPal permet aux utilisateurs de suivre leur consommation alimentaire.
 
-A few resources to get you started if this is your first Flutter project:
+## 📲 Applications similaires
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Il existe de nombreuses applications de suivi de l'alimentation sur le marché, chacune offrant différentes fonctionnalités. Voici quelques exemples :
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **MyFitnessPal**
+    - iOS: [MyFitnessPal sur l'App Store](https://apps.apple.com/us/app/myfitnesspal/id568832228)
+    - Android: [MyFitnessPal sur Google Play](https://play.google.com/store/apps/details?id=com.myfitnesspal.android)
+
+- **Lose It!**
+    - iOS: [Lose It! sur l'App Store](https://apps.apple.com/us/app/lose-it/id297368587)
+    - Android: [Lose It! sur Google Play](https://play.google.com/store/apps/details?id=com.loseit)
+
+- **Cronometer**
+    - iOS: [Cronometer sur l'App Store](https://apps.apple.com/us/app/cronometer/id1049223637)
+    - Android: [Cronometer sur Google Play](https://play.google.com/store/apps/details?id=com.cronometer.android)
+
+## 🤔 MoodBoard
+
+TODO
+
+## 📍 Site Map
+
+TODO
+
+## 👀 Design de l'application
+
+TODO
+
+## ⚙️ Fonctionnalités de l'application
+
+- **Ajout d'aliments** : Les utilisateurs peuvent ajouter des aliments manuellement ou les scanner via un code-barres.
+- **Recherche d'aliments** : Permet aux utilisateurs de rechercher des aliments en utilisant des mots-clés pour trouver des informations nutritionnelles.
+- **Statistiques nutritionnelles** : Affiche un résumé des calories, glucides, lipides et protéines consommés.
+- **Sauvegarde des aliments** : Les utilisateurs peuvent sauvegarder leurs aliments favoris pour un accès rapide.
+- **Interface utilisateur intuitive** : Conçue pour être facile à utiliser sur des écrans de différentes tailles.
+
+## 📁 Les différents fichiers
+
+Tous les fichiers se trouvent dans le dossier `lib`.
+
+- **Pages** :
+    - **Home** :
+        - **Profile** :
+            - `activity_page.dart` : Affiche les activités de l'utilisateur.
+            - `dashboard_page.dart` : Page de tableau de bord de l'utilisateur, résumant les informations importantes.
+            - `main_page.dart` : Page principale du profil de l'utilisateur.
+        - **Logs** :
+            - `home_page.dart` : Page d'accueil de l'application.
+            - `login_page.dart` : Page de connexion de l'utilisateur.
+            - `register_page.dart` : Page d'inscription pour les nouveaux utilisateurs.
+
+- **Models** :
+    - `add_food_page.dart` : Page permettant d'ajouter un nouvel aliment via des formulaires.
+    - `food.dart` : Modèle de données pour les aliments, définissant les attributs nutritionnels.
+
+- **Routes** :
+    - `app_routes.dart` : Contient les routes de navigation de l'application.
+
+- **firebase_options.dart** : Configuration pour l'intégration de Firebase.
+- **main.dart** : Point d'entrée de l'application Flutter.
+- **TODO.txt** : Liste des tâches à accomplir et améliorations à apporter.
+
+## ⏳ État d'avancement
+- [ ] Voir dans la TODO page.
+
+### Bugs à corriger
+- [ ] Optimiser la recherche d'aliments pour de meilleures performances.
+- [ ] Gérer les erreurs de connexion avec Firestore.
+
+### Améliorations
+- [ ] Ajouter un système de notifications pour les utilisateurs concernant des objectifs de santé.
+- [ ] Intégrer des fonctionnalités de suivi des exercices physiques.
+- [ ] Permettre aux utilisateurs de définir des objectifs de nutrition personnalisés.
+- [ ] Voir avec le fichier TODO
+
+## 💻 Technologies utilisées
+
+- Flutter
+- Dart
+- Firebase (Firestore et Auth)
+- HTTP (pour les requêtes API)
