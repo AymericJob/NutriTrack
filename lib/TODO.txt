@@ -8,6 +8,8 @@ Regarder pour faire un systeme de favoris
 Regarder pour tenir un historique en fonction de chaque jours et de chaque utilisateur
 Regarder pour faire un systeme de notification
 Rgarder pour avoir ls différents repas de la journées.....
+Regarder pour avoir un historique au jours le jours et des jours précédents....
+
 
 
 
@@ -17,3 +19,4 @@ Regarder pour faie une barre de recherche tout en bas avc l'icone de recherche p
 -->Un peu a la myfitnesspas mais de manière revistée.....
 
 Problème a traiter... je prends bien en compte les aliments et je les ai bien dans firestoire mais si je me déco-reco, je ne fait pas de recherche dans firestore pour les récupérer
+-->Régler mais a voir pour les disques de couleurs en fonctions des aliments....

@@ -17,7 +17,6 @@ class _DashboardPageState extends State<DashboardPage> {
   Stream<StepCount>? _stepCountStream;
   DateTime _lastRecordedDate = DateTime.now();
 
-  // Variables pour stocker les objectifs nutritionnels récupérés de Firestore
   int _calorieGoal = 0;
   int _carbsGoal = 0;
   int _proteinGoal = 0;
@@ -27,7 +26,8 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     _initPedometer();
-    _fetchNutritionGoals(); // Récupérer les objectifs nutritionnels depuis Firestore
+    _fetchNutritionGoals();
+    _fetchFoods(); // Ajoutez cet appel pour récupérer les aliments
   }
 
   void _initPedometer() {
@@ -48,7 +48,6 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // Fonction pour récupérer les objectifs nutritionnels depuis Firestore
   Future<void> _fetchNutritionGoals() async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
@@ -75,6 +74,35 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _fetchFoods() async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      try {
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('foods')
+            .get();
+
+        List<Food> fetchedFoods = snapshot.docs.map((doc) {
+          return Food(
+            name: doc['name'],
+            calories: doc['calories'],
+            carbs: doc['carbs'],
+            fat: doc['fat'],
+            protein: doc['protein'],
+          );
+        }).toList();
+
+        setState(() {
+          _foods = fetchedFoods; // Mettez à jour la liste des aliments
+        });
+      } catch (e) {
+        print("Erreur lors de la récupération des aliments: $e");
+      }
+    }
+  }
+
   void _addFood(Food food) {
     setState(() {
       _foods.add(food);
@@ -83,7 +111,6 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculer les macros actuelles consommées
     int totalCalories = _foods.fold(0, (sum, food) => sum + food.calories);
     int totalCarbs = _foods.fold(0, (sum, food) => sum + food.carbs);
     int totalFat = _foods.fold(0, (sum, food) => sum + food.fat);
@@ -108,123 +135,71 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
             SizedBox(height: 10),
-            // Organiser les indicateurs circulaires en ligne (Row)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildCircularProgressIndicator('Calories', totalCalories, _calorieGoal, Colors.red),
                 _buildCircularProgressIndicator('Carbs', totalCarbs, _carbsGoal, Colors.blue),
-                _buildCircularProgressIndicator('Fat', totalFat, _fatGoal, Colors.green),
-                _buildCircularProgressIndicator('Protein', totalProtein, _proteinGoal, Colors.orange),
+                _buildCircularProgressIndicator('Protein', totalProtein, _proteinGoal, Colors.green),
+                _buildCircularProgressIndicator('Fat', totalFat, _fatGoal, Colors.orange),
               ],
             ),
             SizedBox(height: 20),
-            // Bouton Ajouter un Aliment sous les indicateurs
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddFoodPage(onFoodAdded: _addFood),
-                    ),
-                  );
-                },
-                child: Text('Ajouter un Aliment'),
+            Text(
+              'Aliments ajoutés',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
             ),
-            SizedBox(height: 20),
-            _buildStatsCard(
-              icon: FontAwesomeIcons.walking,
-              title: 'Steps Today: $_stepsToday / 10,000',
-              subtitle: 'Exercise: 400 cal, 1:01 hr',
+            Expanded(
+              child: ListView.builder(
+                itemCount: _foods.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(_foods[index].name),
+                    subtitle: Text('Calories: ${_foods[index].calories}'),
+                  );
+                },
+              ),
             ),
-            _buildStatsCard(
-              icon: FontAwesomeIcons.weight,
-              title: 'Weight: XX kg',
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddFoodPage(onFoodAdded: _addFood),
+                  ),
+                );
+              },
+              child: Text('Ajouter un aliment'),
             ),
-            SizedBox(height: 20),
-            _buildListTile(
-              icon: FontAwesomeIcons.utensils,
-              title: 'Today\'s Meals',
-            ),
-            _buildListTile(
-              icon: FontAwesomeIcons.chartPie,
-              title: 'Statistics',
-            ),
+            SizedBox(height: 10),
+            Text('Pas aujourd\'hui: $_stepsToday'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCircularProgressIndicator(String label, int value, int goal, Color color) {
-    double progress = (goal > 0) ? value / goal : 0;
-
+  Widget _buildCircularProgressIndicator(String title, int currentValue, int goalValue, Color color) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Le cercle avec la progression
-        SizedBox(
-          height: 100,
-          width: 100,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              CircularProgressIndicator(
-                value: progress,
-                strokeWidth: 10,
-                backgroundColor: color.withOpacity(0.2),
-                valueColor: AlwaysStoppedAnimation<Color>(color),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 10), // Espacement entre le cercle et le texte
-        // Valeur actuelle en dessous du cercle
         Text(
-          '$value / $goal',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+          title,
+          style: TextStyle(color: Colors.black54),
         ),
-        SizedBox(height: 5), // Petit espacement entre les valeurs et le label
-        // Label du macro (Calories, Carbs, etc.)
-        Text(
-          label,
-          style: TextStyle(fontSize: 16, color: color),
+        SizedBox(height: 5),
+        CircularProgressIndicator(
+          value: goalValue > 0 ? currentValue / goalValue : 0,
+          backgroundColor: Colors.grey[300],
+          valueColor: AlwaysStoppedAnimation<Color>(color),
+          strokeWidth: 8,
         ),
+        SizedBox(height: 5),
+        Text('$currentValue / $goalValue'),
       ],
     );
-  }
-
-
-
-
-  Widget _buildStatsCard({required IconData icon, required String title, String? subtitle}) {
-    return Card(
-      elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: ListTile(
-        leading: Icon(icon, size: 30, color: Colors.teal),
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: subtitle != null ? Text(subtitle) : null,
-      ),
-    );
-  }
-
-  Widget _buildListTile({required IconData icon, required String title}) {
-    return Card(
-      elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: ListTile(
-        leading: Icon(icon, size: 30, color: Colors.teal),
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _stepCountStream?.listen((_) {}).cancel();
-    super.dispose();
   }
 }
