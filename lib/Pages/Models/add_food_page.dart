@@ -5,6 +5,7 @@ import 'package:barcode_scan2/barcode_scan2.dart'; // Importer le package
 import '../models/food.dart';
 import 'dart:convert'; // Pour la manipulation JSON
 import 'package:http/http.dart' as http; // Pour effectuer des requêtes HTTP
+import '../Models/FoodDetailPage.dart'; // Importer la page des détails de l'aliment
 
 class AddFoodPage extends StatefulWidget {
   final Function(Food) onFoodAdded;
@@ -47,11 +48,15 @@ class _AddFoodPageState extends State<AddFoodPage> {
         final data = jsonDecode(response.body);
         if (data['product'] != null) {
           final product = data['product'];
-          _nameController.text = product['product_name'] ?? 'Inconnu';
-          _caloriesController.text = product['nutriments']?['energy-kcal']?.toString() ?? '0';
-          _carbsController.text = product['nutriments']?['carbohydrates']?.toString() ?? '0';
-          _fatController.text = product['nutriments']?['fat']?.toString() ?? '0';
-          _proteinController.text = product['nutriments']?['proteins']?.toString() ?? '0';
+          final food = Food(
+            name: product['product_name'] ?? 'Inconnu',
+            calories: product['nutriments']?['energy-kcal']?.toInt() ?? 0,
+            carbs: product['nutriments']?['carbohydrates']?.toInt() ?? 0,
+            fat: product['nutriments']?['fat']?.toInt() ?? 0,
+            protein: product['nutriments']?['proteins']?.toInt() ?? 0,
+          );
+          await _saveFoodToFirestore(food); // Enregistrer d'abord dans Firebase
+          _navigateToFoodDetailPage(food); // Naviguer vers la page des détails
         } else {
           _showMessage("Produit non trouvé.");
         }
@@ -62,6 +67,40 @@ class _AddFoodPageState extends State<AddFoodPage> {
       print("Erreur lors de l'appel API : $e");
       _showMessage("Erreur de connexion.");
     }
+  }
+
+  Future<void> _saveFoodToFirestore(Food food) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('foods')
+            .add({
+          'name': food.name,
+          'calories': food.calories,
+          'carbs': food.carbs,
+          'fat': food.fat,
+          'protein': food.protein,
+        });
+        print("Aliment enregistré dans Firestore pour l'utilisateur $uid.");
+      } catch (e) {
+        print("Erreur lors de l'enregistrement de l'aliment: $e");
+      }
+    }
+  }
+
+  void _navigateToFoodDetailPage(Food food) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FoodDetailPage(
+          food: food,
+          onFoodAdded: widget.onFoodAdded,
+        ),
+      ),
+    );
   }
 
   void _showMessage(String message) {
@@ -81,27 +120,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
       widget.onFoodAdded(food);
       _saveFoodToFirestore(food);
       Navigator.pop(context);
-    }
-  }
-
-  Future<void> _saveFoodToFirestore(Food food) async {
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      try {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .collection('foods')
-            .add({
-          'name': food.name,
-          'calories': food.calories,
-          'carbs': food.carbs,
-          'fat': food.fat,
-          'protein': food.protein,
-        });
-      } catch (e) {
-        print("Erreur lors de l'enregistrement de l'aliment: $e");
-      }
     }
   }
 
