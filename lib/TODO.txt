@@ -33,3 +33,5 @@ NOW !!
 Regarder pour faire une page pour chaque aliments scanné ou quand je fais une recerche et que je cliq dessus pour voir une page de l'aliments et ses infomrations nutritionnlle et ensuite pouvoir l'ajouter ou nom au repas
 ->Faire une page ou u model style aliment ou quoi
 ->Améliorer le design de l'ajout d'aliments et regarder pour faire un historique pour chaque jours avec les différents repas de la journées
+
+Regarder pour le barcode scan qui ne veut pas mettre les aliments dans FoodDetails, j'ai une erreur de connexion je sais pas pourqoi
