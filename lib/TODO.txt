@@ -1,8 +1,11 @@
 //TODO
+DONE:
 Regarder pour intégrer la register page et autres... elles sont déja fait mais pas intégrer -> DONE 18/10 20:08
 Regarder pour faire aussi le mot de passe oublié et les différents utilisateurs style invité et si invité alors on ne peux pas avsoir acces a tout
 -->Check avec un vrai mail
 Regarder pour scanner des vrai aliments
+
+
 Regarder pour faire une recherch d'aliment dans une base de donnée
 Regarder pour faire un systeme de favoris
 Regarder pour tenir un historique en fonction de chaque jours et de chaque utilisateur
@@ -22,3 +25,11 @@ Regarder pour faie une barre de recherche tout en bas avc l'icone de recherche p
 
 Problème a traiter... je prends bien en compte les aliments et je les ai bien dans firestoire mais si je me déco-reco, je ne fait pas de recherche dans firestore pour les récupérer
 -->Régler mais a voir pour les disques de couleurs en fonctions des aliments....
+
+
+
+NOW !!
+
+Regarder pour faire une page pour chaque aliments scanné ou quand je fais une recerche et que je cliq dessus pour voir une page de l'aliments et ses infomrations nutritionnlle et ensuite pouvoir l'ajouter ou nom au repas
+->Faire une page ou u model style aliment ou quoi
+->Améliorer le design de l'ajout d'aliments et regarder pour faire un historique pour chaque jours avec les différents repas de la journées
