@@ -33,7 +33,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void _initPedometer() {
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream?.listen(
-          (StepCount stepCount) {
+      (StepCount stepCount) {
         if (_lastRecordedDate.day != DateTime.now().day) {
           _stepsToday = 0;
           _lastRecordedDate = DateTime.now();
@@ -86,12 +86,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
         List<Food> fetchedFoods = snapshot.docs.map((doc) {
           return Food(
-            name: doc['name'],
-            calories: doc['calories'],
-            carbs: doc['carbs'],
-            fat: doc['fat'],
-            protein: doc['protein'],
-          );
+              name: doc['name'],
+              calories: (doc['calories'] as num).toInt(),
+              carbs: (doc['carbs'] as num).toInt(),
+              fat: (doc['fat'] as num).toInt(),
+              protein: (doc['protein'] as num).toInt());
         }).toList();
 
         setState(() {
@@ -138,10 +137,14 @@ class _DashboardPageState extends State<DashboardPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildCircularProgressIndicator('Calories', totalCalories, _calorieGoal, Colors.red),
-                _buildCircularProgressIndicator('Carbs', totalCarbs, _carbsGoal, Colors.blue),
-                _buildCircularProgressIndicator('Protein', totalProtein, _proteinGoal, Colors.green),
-                _buildCircularProgressIndicator('Fat', totalFat, _fatGoal, Colors.orange),
+                _buildCircularProgressIndicator(
+                    'Calories', totalCalories, _calorieGoal, Colors.red),
+                _buildCircularProgressIndicator(
+                    'Carbs', totalCarbs, _carbsGoal, Colors.blue),
+                _buildCircularProgressIndicator(
+                    'Protein', totalProtein, _proteinGoal, Colors.green),
+                _buildCircularProgressIndicator(
+                    'Fat', totalFat, _fatGoal, Colors.orange),
               ],
             ),
             SizedBox(height: 20),
@@ -183,7 +186,8 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildCircularProgressIndicator(String title, int currentValue, int goalValue, Color color) {
+  Widget _buildCircularProgressIndicator(
+      String title, int currentValue, int goalValue, Color color) {
     return Column(
       children: [
         Text(

@@ -1,11 +1,14 @@
+// Pages/Home/AddFoodPage.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:barcode_scan2/barcode_scan2.dart'; // Importer le package
+import 'package:barcode_scan2/barcode_scan2.dart';
 import '../models/food.dart';
-import 'dart:convert'; // Pour la manipulation JSON
-import 'package:http/http.dart' as http; // Pour effectuer des requêtes HTTP
-import '../Models/FoodDetailPage.dart'; // Importer la page des détails de l'aliment
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../Models/FoodDetailPage.dart'; // Assurez-vous que ce chemin est correct
+import 'FoodSearchPage.dart'; // Assurez-vous que ce chemin est correct
+
 
 class AddFoodPage extends StatefulWidget {
   final Function(Food) onFoodAdded;
@@ -26,16 +29,13 @@ class _AddFoodPageState extends State<AddFoodPage> {
 
   Future<void> _scanBarcode() async {
     try {
-      print("Scanning started..."); // Log pour débogage
       final ScanResult result = await BarcodeScanner.scan();
-      print("Scanning finished: ${result.rawContent}"); // Log pour débogage
       if (result.rawContent.isNotEmpty) {
         _fetchFoodData(result.rawContent);
       } else {
         _showMessage("Aucun contenu scanné.");
       }
     } catch (e) {
-      print("Erreur lors du scan : $e"); // Log pour débogage
       _showMessage("Erreur lors du scan. Veuillez réessayer.");
     }
   }
@@ -48,15 +48,28 @@ class _AddFoodPageState extends State<AddFoodPage> {
         final data = jsonDecode(response.body);
         if (data['product'] != null) {
           final product = data['product'];
+          _nameController.text = product['product_name'] ?? 'Inconnu';
+          _caloriesController.text = product['nutriments']?['energy-kcal']?.toString() ?? '0';
+          _carbsController.text = product['nutriments']?['carbohydrates']?.toString() ?? '0';
+          _fatController.text = product['nutriments']?['fat']?.toString() ?? '0';
+          _proteinController.text = product['nutriments']?['proteins']?.toString() ?? '0';
+
+          // Créez l'objet Food et naviguez vers FoodDetailsPage
           final food = Food(
-            name: product['product_name'] ?? 'Inconnu',
-            calories: product['nutriments']?['energy-kcal']?.toInt() ?? 0,
-            carbs: product['nutriments']?['carbohydrates']?.toInt() ?? 0,
-            fat: product['nutriments']?['fat']?.toInt() ?? 0,
-            protein: product['nutriments']?['proteins']?.toInt() ?? 0,
+            name: _nameController.text,
+            calories: int.parse(_caloriesController.text),
+            carbs: int.parse(_carbsController.text),
+            fat: int.parse(_fatController.text),
+            protein: int.parse(_proteinController.text),
           );
-          await _saveFoodToFirestore(food); // Enregistrer d'abord dans Firebase
-          _navigateToFoodDetailPage(food); // Naviguer vers la page des détails
+
+          // Naviguer vers la page FoodDetails avec l'objet food
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FoodDetailPage(food: food),
+            ),
+          );
         } else {
           _showMessage("Produit non trouvé.");
         }
@@ -64,8 +77,27 @@ class _AddFoodPageState extends State<AddFoodPage> {
         _showMessage("Erreur lors de la récupération des données.");
       }
     } catch (e) {
-      print("Erreur lors de l'appel API : $e");
       _showMessage("Erreur de connexion.");
+    }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _submit() async {
+    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+      final food = Food(
+        name: _nameController.text,
+        calories: int.parse(_caloriesController.text),
+        carbs: int.parse(_carbsController.text),
+        fat: int.parse(_fatController.text),
+        protein: int.parse(_proteinController.text),
+      );
+
+      widget.onFoodAdded(food);
+      _saveFoodToFirestore(food);
+      Navigator.pop(context);
     }
   }
 
@@ -84,43 +116,19 @@ class _AddFoodPageState extends State<AddFoodPage> {
           'fat': food.fat,
           'protein': food.protein,
         });
-        print("Aliment enregistré dans Firestore pour l'utilisateur $uid.");
       } catch (e) {
         print("Erreur lors de l'enregistrement de l'aliment: $e");
       }
     }
   }
 
-  void _navigateToFoodDetailPage(Food food) {
+  void _navigateToSearchPage() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FoodDetailPage(
-          food: food,
-          onFoodAdded: widget.onFoodAdded,
-        ),
+        builder: (context) => FoodSearchPage(), // Alimentez avec une liste d'aliments si disponible
       ),
     );
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  void _submit() {
-    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      final food = Food(
-        name: _nameController.text,
-        calories: int.parse(_caloriesController.text),
-        carbs: int.parse(_carbsController.text),
-        fat: int.parse(_fatController.text),
-        protein: int.parse(_proteinController.text),
-      );
-
-      widget.onFoodAdded(food);
-      _saveFoodToFirestore(food);
-      Navigator.pop(context);
-    }
   }
 
   @override
@@ -144,53 +152,51 @@ class _AddFoodPageState extends State<AddFoodPage> {
             key: _formKey,
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Ajoutez vos aliments",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  _buildTextField(_nameController, 'Nom de l\'aliment'),
-                  _buildTextField(_caloriesController, 'Calories', isNumeric: true),
-                  _buildTextField(_carbsController, 'Carbs (g)', isNumeric: true),
-                  _buildTextField(_fatController, 'Graisses (g)', isNumeric: true),
-                  _buildTextField(_proteinController, 'Protéines (g)', isNumeric: true),
+                  _buildTextField(_nameController, "Nom de l'aliment"),
+                  _buildTextField(_caloriesController, "Calories", isNumeric: true),
+                  _buildTextField(_carbsController, "Glucides", isNumeric: true),
+                  _buildTextField(_fatController, "Matières grasses", isNumeric: true),
+                  _buildTextField(_proteinController, "Protéines", isNumeric: true),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: _scanBarcode, // Appel de la méthode de scan
+                    onPressed: _scanBarcode,
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.teal,
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.teal,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                       padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                     ),
-                    child: Text(
-                      'Scanner un code-barres',
-                      style: TextStyle(fontSize: 18),
-                    ),
+                    child: Text('Scanner un code-barres', style: TextStyle(fontSize: 18)),
                   ),
                   SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: _submit,
+                    onPressed: _navigateToSearchPage, // Rediriger vers la page de recherche
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.teal,
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.teal,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                       padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                     ),
-                    child: Text(
-                      'Ajouter',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    child: Text('Rechercher un aliment', style: TextStyle(fontSize: 18)),
+                  ),
+                  SizedBox(height: 30),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: _submit,
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.teal,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                       ),
+                      child: Text('Ajouter', style: TextStyle(fontSize: 18)),
                     ),
                   ),
                 ],
@@ -203,31 +209,24 @@ class _AddFoodPageState extends State<AddFoodPage> {
   }
 
   Widget _buildTextField(TextEditingController controller, String label, {bool isNumeric = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(color: Colors.teal, width: 1),
-          ),
-          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+    return TextFormField(
+      controller: controller,
+      keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+      decoration: InputDecoration(
+        hintText: label,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
         ),
-        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Veuillez entrer une valeur.';
-          }
-          if (isNumeric && int.tryParse(value) == null) {
-            return 'Veuillez entrer un nombre valide.';
-          }
-          return null;
-        },
+        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Veuillez entrer $label';
+        }
+        return null;
+      },
     );
   }
 }

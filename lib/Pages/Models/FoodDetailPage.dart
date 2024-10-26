@@ -4,9 +4,8 @@ import '../models/food.dart';
 
 class FoodDetailPage extends StatefulWidget {
   final Food food;
-  final Function(Food) onFoodAdded; // Ajusté pour ne prendre qu'un seul paramètre Food
 
-  const FoodDetailPage({Key? key, required this.food, required this.onFoodAdded}) : super(key: key);
+  const FoodDetailPage({Key? key, required this.food}) : super(key: key);
 
   @override
   _FoodDetailPageState createState() => _FoodDetailPageState();
@@ -18,21 +17,6 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
   // Méthode pour mettre à jour les valeurs nutritionnelles en fonction de la quantité
   int _calculateValue(int baseValue) {
     return (baseValue * _quantity).round();
-  }
-
-  // Fonction pour ajouter l'aliment avec la quantité spécifiée
-  void _addFood() {
-    // Crée une copie de l'aliment avec la quantité choisie
-    Food foodWithQuantity = Food(
-      name: widget.food.name,
-      calories: _calculateValue(widget.food.calories),
-      carbs: _calculateValue(widget.food.carbs),
-      fat: _calculateValue(widget.food.fat),
-      protein: _calculateValue(widget.food.protein),
-    );
-
-    widget.onFoodAdded(foodWithQuantity); // Appelle la fonction avec le nouvel aliment
-    Navigator.pop(context); // Ferme la page après ajout
   }
 
   @override
@@ -58,12 +42,12 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
               Text(
                 "Détails de l'aliment",
                 style: TextStyle(
-                  fontSize: 20, // Taille réduite
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.teal,
                 ),
               ),
-              SizedBox(height: 10), // Réduire l'espacement
+              SizedBox(height: 20),
               Text(
                 "Quantité (en portions):",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -81,7 +65,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _quantity = double.tryParse(value) ?? 1.0; // Met à jour la quantité
+                    _quantity = double.tryParse(value) ?? 1.0;
                   });
                 },
               ),
@@ -92,13 +76,13 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   _buildProgressIndicator(
                     "Calories",
                     _calculateValue(widget.food.calories),
-                    2000, // AJR
+                    2000, // Apport journalier recommandé (AJR)
                     Colors.orange,
                   ),
                   _buildProgressIndicator(
                     "Carbs",
                     _calculateValue(widget.food.carbs),
-                    300, // AJR
+                    300, // AJR pour les glucides en grammes
                     Colors.blue,
                   ),
                 ],
@@ -110,34 +94,16 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   _buildProgressIndicator(
                     "Graisses",
                     _calculateValue(widget.food.fat),
-                    70, // AJR
+                    70, // AJR pour les graisses en grammes
                     Colors.red,
                   ),
                   _buildProgressIndicator(
                     "Protéines",
                     _calculateValue(widget.food.protein),
-                    50, // AJR
+                    50, // AJR pour les protéines en grammes
                     Colors.green,
                   ),
                 ],
-              ),
-              SizedBox(height: 30), // Ajout d'espace avant le bouton
-              Center( // Centrer le bouton
-                child: ElevatedButton(
-                  onPressed: _addFood,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.teal,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                  ),
-                  child: Text(
-                    'Ajouter l\'aliment',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
               ),
             ],
           ),
@@ -153,12 +119,12 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
       child: Column(
         children: [
           CircularPercentIndicator(
-            radius: 60.0, // Taille réduite
-            lineWidth: 8.0, // Épaisseur réduite
+            radius: 80.0,
+            lineWidth: 10.0,
             percent: percentage,
             center: Text(
               "$value g",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             progressColor: color,
             backgroundColor: color.withOpacity(0.2),
@@ -168,7 +134,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: color,
             ),

@@ -7,6 +7,9 @@ import '../Pages/Home/Profile/profile_page.dart';
 import '../Pages/Home/Profile/personal_info_page.dart';
 import '../Pages/Home/Profile/nutrition_goals_page.dart';
 import '../Pages/Home/Profile/activity_tracking_page.dart';
+import '../Pages/Models/FoodDetailPage.dart';
+import '../Pages/models/food.dart'; // Ajoute cet import pour la page de détails
+
 
 class AppRoutes {
   // Anciennes routes
@@ -20,6 +23,8 @@ class AppRoutes {
   static const String personalInfoPage = '/personal_info';
   static const String nutritionGoalsPage = '/nutrition_goals';
   static const String activityTrackingPage = '/activity_tracking';
+  static const String foodDetailsPage = '/food_details';
+
 
   // Gestionnaire de routes
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -43,6 +48,12 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => NutritionGoalsPage());
       case activityTrackingPage:
         return MaterialPageRoute(builder: (_) => ActivityTrackingPage());
+      case foodDetailsPage:
+        if (settings.arguments is Food) {
+          final food = settings.arguments as Food;
+          return MaterialPageRoute(builder: (_) => FoodDetailPage(food: food));
+        }
+        return _errorRoute();
 
     // Route par défaut (en cas de route non trouvée)
       default:
