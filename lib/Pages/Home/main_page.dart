@@ -36,15 +36,15 @@ class _MainPageState extends State<MainPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Déconnexion', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+          title: Text('Log out', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Text('Are you sure you want to log out?'),
           actions: [
             TextButton(
-              child: Text('Annuler', style: TextStyle(color: Colors.blue)),
+              child: Text('Cancel', style: TextStyle(color: Colors.blue)),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             TextButton(
-              child: Text('Déconnexion', style: TextStyle(color: Colors.red)),
+              child: Text('Log out', style: TextStyle(color: Colors.red)),
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
@@ -88,28 +88,28 @@ class _MainPageState extends State<MainPage> {
               children: [
                 Text('MyFitnessPal', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
-                Text('Bienvenue, ${FirebaseAuth.instance.currentUser?.email ?? 'Utilisateur'}',
+                Text('Welcome, ${FirebaseAuth.instance.currentUser?.email ?? 'Users'}',
                     style: TextStyle(color: Colors.white70, fontSize: 16)),
               ],
             ),
           ),
           ListTile(
             leading: Icon(Icons.settings),
-            title: Text('Paramètres'),
+            title: Text('Settings'),
             onTap: () {
               Navigator.of(context).pushNamed('/settings'); // Assurez-vous que cette route est définie
             },
           ),
           ListTile(
             leading: Icon(Icons.info),
-            title: Text('À propos'),
+            title: Text('More about us'),
             onTap: () {
               // Action pour ouvrir la page À propos
             },
           ),
           ListTile(
             leading: Icon(Icons.exit_to_app),
-            title: Text('Déconnexion'),
+            title: Text('Log out'),
             onTap: () => _signOut(context),
           ),
         ],
@@ -134,14 +134,11 @@ class _MainPageState extends State<MainPage> {
                 right: 0,
                 child: Container(
                   padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(6)),
-                  constraints: BoxConstraints(minWidth: 12, minHeight: 12),
-                  child: Text('3', style: TextStyle(color: Colors.white, fontSize: 8), textAlign: TextAlign.center),
                 ),
               ),
             ],
           ),
-          label: 'Activités',
+          label: 'Activity',
         ),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
       ],

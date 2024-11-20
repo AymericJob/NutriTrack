@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:myfitnesspal/Pages/Home/main_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../Home/dashboard_page.dart';
 import '../models/food.dart';
 
 class FoodDetailPage extends StatefulWidget {
@@ -17,6 +21,45 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
   // Méthode pour mettre à jour les valeurs nutritionnelles en fonction de la quantité
   int _calculateValue(int baseValue) {
     return (baseValue * _quantity).round();
+  }
+
+  // Méthode pour ajouter l'aliment aux données utilisateur et rediriger vers DashboardPage
+  Future<void> _addFood() async {
+    try {
+      // Logique pour ajouter l'aliment à Firestore
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('foods')
+            .add({
+          'name': widget.food.name,
+          'calories': _calculateValue(widget.food.calories),
+          'carbs': _calculateValue(widget.food.carbs),
+          'fat': _calculateValue(widget.food.fat),
+          'protein': _calculateValue(widget.food.protein),
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Aliment ajouté avec succès")),
+        );
+
+        // Redirection vers DashboardPage après l'ajout
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainPage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erreur : utilisateur non authentifié")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erreur lors de l'ajout de l'aliment")),
+      );
+      print("Erreur lors de l'ajout de l'aliment : $e");
+    }
   }
 
   @override
@@ -104,6 +147,21 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                     Colors.green,
                   ),
                 ],
+              ),
+              SizedBox(height: 30),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _addFood,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.teal,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                  ),
+                  child: Text('Ajouter cet aliment', style: TextStyle(fontSize: 18)),
+                ),
               ),
             ],
           ),

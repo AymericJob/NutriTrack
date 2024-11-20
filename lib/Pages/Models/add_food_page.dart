@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 import '../Models/FoodDetailPage.dart'; // Assurez-vous que ce chemin est correct
 import 'FoodSearchPage.dart'; // Assurez-vous que ce chemin est correct
 
-
 class AddFoodPage extends StatefulWidget {
   final Function(Food) onFoodAdded;
 
@@ -27,10 +26,20 @@ class _AddFoodPageState extends State<AddFoodPage> {
   final _fatController = TextEditingController();
   final _proteinController = TextEditingController();
 
+  // Réinitialiser les champs
+  void _resetFields() {
+    _nameController.clear();
+    _caloriesController.clear();
+    _carbsController.clear();
+    _fatController.clear();
+    _proteinController.clear();
+  }
+
   Future<void> _scanBarcode() async {
     try {
       final ScanResult result = await BarcodeScanner.scan();
       if (result.rawContent.isNotEmpty) {
+        _resetFields();
         _fetchFoodData(result.rawContent);
       } else {
         _showMessage("Aucun contenu scanné.");
@@ -48,6 +57,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
         final data = jsonDecode(response.body);
         if (data['product'] != null) {
           final product = data['product'];
+
           _nameController.text = product['product_name'] ?? 'Inconnu';
           _caloriesController.text = product['nutriments']?['energy-kcal']?.toString() ?? '0';
           _carbsController.text = product['nutriments']?['carbohydrates']?.toString() ?? '0';
@@ -57,13 +67,12 @@ class _AddFoodPageState extends State<AddFoodPage> {
           // Créez l'objet Food et naviguez vers FoodDetailsPage
           final food = Food(
             name: _nameController.text,
-            calories: int.parse(_caloriesController.text),
-            carbs: int.parse(_carbsController.text),
-            fat: int.parse(_fatController.text),
-            protein: int.parse(_proteinController.text),
+            calories: int.tryParse(_caloriesController.text) ?? 0,
+            carbs: int.tryParse(_carbsController.text) ?? 0,
+            fat: int.tryParse(_fatController.text) ?? 0,
+            protein: int.tryParse(_proteinController.text) ?? 0,
           );
 
-          // Naviguer vers la page FoodDetails avec l'objet food
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -89,10 +98,10 @@ class _AddFoodPageState extends State<AddFoodPage> {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       final food = Food(
         name: _nameController.text,
-        calories: int.parse(_caloriesController.text),
-        carbs: int.parse(_carbsController.text),
-        fat: int.parse(_fatController.text),
-        protein: int.parse(_proteinController.text),
+        calories: int.tryParse(_caloriesController.text) ?? 0,
+        carbs: int.tryParse(_carbsController.text) ?? 0,
+        fat: int.tryParse(_fatController.text) ?? 0,
+        protein: int.tryParse(_proteinController.text) ?? 0,
       );
 
       widget.onFoodAdded(food);
@@ -173,7 +182,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
                   ),
                   SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: _navigateToSearchPage, // Rediriger vers la page de recherche
+                    onPressed: _navigateToSearchPage,
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: Colors.teal,
