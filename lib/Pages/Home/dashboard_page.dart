@@ -25,28 +25,10 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    _initPedometer();
     _fetchNutritionGoals();
     _fetchFoods(); // Ajoutez cet appel pour récupérer les aliments
   }
 
-  void _initPedometer() {
-    _stepCountStream = Pedometer.stepCountStream;
-    _stepCountStream?.listen(
-      (StepCount stepCount) {
-        if (_lastRecordedDate.day != DateTime.now().day) {
-          _stepsToday = 0;
-          _lastRecordedDate = DateTime.now();
-        }
-        setState(() {
-          _stepsToday += stepCount.steps;
-        });
-      },
-      onError: (error) {
-        print("Erreur lors de l'obtention des pas: $error");
-      },
-    );
-  }
 
   Future<void> _fetchNutritionGoals() async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
@@ -179,7 +161,6 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Text('Ajouter un aliment'),
             ),
             SizedBox(height: 10),
-            Text('Pas aujourd\'hui: $_stepsToday'),
           ],
         ),
       ),
