@@ -67,7 +67,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.food.name),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.blueAccent,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -87,7 +87,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.teal,
+                  color: Colors.blueAccent,
                 ),
               ),
               SizedBox(height: 20),
@@ -154,7 +154,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   onPressed: _addFood,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
