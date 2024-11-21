@@ -5,7 +5,6 @@ import '../models/food.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-
 class FoodSearchPage extends StatefulWidget {
   @override
   _FoodSearchPageState createState() => _FoodSearchPageState();
@@ -66,7 +65,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Recherche d'aliments"),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -78,10 +77,15 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
                 hintText: "Recherchez un aliment",
                 suffixIcon: IconButton(
                   icon: Icon(Icons.search),
-                  onPressed: _searchFoods, // Lancer la recherche
+                  onPressed: _searchFoods, // Lancer la recherche lorsque le bouton est pressé
                 ),
                 border: OutlineInputBorder(),
               ),
+              textInputAction: TextInputAction.search, // Indiquer que l'action du clavier est une recherche
+              onSubmitted: (value) {
+                // Lancer la recherche lorsque l'utilisateur appuie sur "Enter"
+                _searchFoods();
+              },
             ),
             SizedBox(height: 20),
             _isLoading
