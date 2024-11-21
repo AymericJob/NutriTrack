@@ -38,3 +38,8 @@ NOW !!
 ->Améliorer le design de l'ajout d'aliments et regarder pour faire un historique pour chaque jours avec les différents repas de la journées
 
 Regarder pour le barcode scan qui ne veut pas mettre les aliments dans FoodDetails, j'ai une erreur de connexion je sais pas pourqoi
+
+##Ou j'en suis
+
+Je me suis arêter sur le fait que lorsque je rentre un aliment je ne veux pouvoir choisir la quantité soit en ml ou en gr et autre et que cela actualise aussi les circle en dessous pour voir a quoi cela correspond
+Prochaine étape regarder pour faire le journal au jour le jours et faire un système de défilement pour voir les jours précédents....
