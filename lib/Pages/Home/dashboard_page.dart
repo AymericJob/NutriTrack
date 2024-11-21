@@ -29,7 +29,6 @@ class _DashboardPageState extends State<DashboardPage> {
     _fetchFoods(); // Ajoutez cet appel pour récupérer les aliments
   }
 
-
   Future<void> _fetchNutritionGoals() async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
@@ -149,20 +148,21 @@ class _DashboardPageState extends State<DashboardPage> {
                 },
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddFoodPage(onFoodAdded: _addFood),
-                  ),
-                );
-              },
-              child: Text('Ajouter un aliment'),
-            ),
-            SizedBox(height: 10),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddFoodPage(onFoodAdded: _addFood),
+            ),
+          );
+        },
+        child: Icon(Icons.add),
+        tooltip: 'Add Food',
+        backgroundColor: Colors.blue,
       ),
     );
   }

@@ -1,4 +1,3 @@
-// Pages/Home/AddFoodPage.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +5,8 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import '../models/food.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../Models/FoodDetailPage.dart'; // Assurez-vous que ce chemin est correct
-import 'FoodSearchPage.dart'; // Assurez-vous que ce chemin est correct
+import '../Models/FoodDetailPage.dart';
+import 'FoodSearchPage.dart';
 
 class AddFoodPage extends StatefulWidget {
   final Function(Food) onFoodAdded;
@@ -26,7 +25,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
   final _fatController = TextEditingController();
   final _proteinController = TextEditingController();
 
-  // Réinitialiser les champs
   void _resetFields() {
     _nameController.clear();
     _caloriesController.clear();
@@ -64,7 +62,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
           _fatController.text = product['nutriments']?['fat']?.toString() ?? '0';
           _proteinController.text = product['nutriments']?['proteins']?.toString() ?? '0';
 
-          // Créez l'objet Food et naviguez vers FoodDetailsPage
           final food = Food(
             name: _nameController.text,
             calories: int.tryParse(_caloriesController.text) ?? 0,
@@ -135,7 +132,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FoodSearchPage(), // Alimentez avec une liste d'aliments si disponible
+        builder: (context) => FoodSearchPage(),
       ),
     );
   }
@@ -145,71 +142,74 @@ class _AddFoodPageState extends State<AddFoodPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Ajouter un aliment'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.blue,  // Couleur bleue pour l'app bar
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.grey.shade200],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildTextField(_nameController, "Nom de l'aliment"),
-                  _buildTextField(_caloriesController, "Calories", isNumeric: true),
-                  _buildTextField(_carbsController, "Glucides", isNumeric: true),
-                  _buildTextField(_fatController, "Matières grasses", isNumeric: true),
-                  _buildTextField(_proteinController, "Protéines", isNumeric: true),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _scanBarcode,
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ajouter un aliment',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,  // Couleur bleue pour le titre
+                  ),
+                ),
+                SizedBox(height: 20),
+                _buildTextField(_nameController, "Nom de l'aliment"),
+                _buildTextField(_caloriesController, "Calories", isNumeric: true),
+                _buildTextField(_carbsController, "Glucides", isNumeric: true),
+                _buildTextField(_fatController, "Matières grasses", isNumeric: true),
+                _buildTextField(_proteinController, "Protéines", isNumeric: true),
+                SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: _scanBarcode,
+                  icon: Icon(Icons.camera_alt, size: 20),
+                  label: Text('Scanner un code-barres'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,  // Couleur bleue pour les boutons
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: _navigateToSearchPage,
+                  icon: Icon(Icons.search, size: 20),
+                  label: Text('Rechercher un aliment'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,  // Couleur bleue pour les boutons
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  ),
+                ),
+                SizedBox(height: 30),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _submit,
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.teal,
+                      backgroundColor: Colors.blue,  // Couleur bleue pour les boutons
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                       padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                     ),
-                    child: Text('Scanner un code-barres', style: TextStyle(fontSize: 18)),
-                  ),
-                  SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: _navigateToSearchPage,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.teal,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                    ),
-                    child: Text('Rechercher un aliment', style: TextStyle(fontSize: 18)),
-                  ),
-                  SizedBox(height: 30),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: _submit,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                      ),
-                      child: Text('Ajouter', style: TextStyle(fontSize: 18)),
+                    child: Text(
+                      'Ajouter',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -218,24 +218,28 @@ class _AddFoodPageState extends State<AddFoodPage> {
   }
 
   Widget _buildTextField(TextEditingController controller, String label, {bool isNumeric = false}) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-      decoration: InputDecoration(
-        hintText: label,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.blue),  // Texte en bleu pour les labels
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Veuillez entrer $label';
+          }
+          return null;
+        },
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Veuillez entrer $label';
-        }
-        return null;
-      },
     );
   }
 }
