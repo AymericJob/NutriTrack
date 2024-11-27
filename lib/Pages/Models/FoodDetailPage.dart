@@ -10,7 +10,6 @@ class FoodDetailPage extends StatefulWidget {
   final Food food;
 
   const FoodDetailPage({Key? key, required this.food}) : super(key: key);
-
   @override
   _FoodDetailPageState createState() => _FoodDetailPageState();
 }

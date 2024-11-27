@@ -1,4 +1,4 @@
-# MyFitnessPal
+# NutriTrack
 
 MyFitnessPal est une application Flutter conçue pour aider les utilisateurs à gérer leur alimentation et leur santé de manière simple et efficace.
 
@@ -73,6 +73,19 @@ TODO
 - **Statistiques nutritionnelles** : Affiche un résumé des calories, glucides, lipides et protéines consommés.
 - **Sauvegarde des aliments** : Les utilisateurs peuvent sauvegarder leurs aliments favoris pour un accès rapide.
 - **Interface utilisateur intuitive** : Conçue pour être facile à utiliser sur des écrans de différentes tailles.
+- - **Recherche avancée d'aliments** :
+    - Intégration d'une API pour afficher des informations nutritionnelles détaillées.
+    - Résultats personnalisables en fonction de mots-clés saisis par l'utilisateur.
+- **Détail des aliments** :
+    - Page de détail présentant les informations sur un aliment spécifique.
+    - Options de personnalisation de la quantité et de l'unité (g, kg, ml, L, etc.).
+- **Ajout simplifié au profil utilisateur** :
+    - Enregistrement des aliments directement dans Firebase pour un accès continu.
+    - Calcul automatique des valeurs en fonction des unités et quantités.
+- **Gestion des aliments liquides et solides** :
+    - Les aliments sont automatiquement catégorisés pour simplifier les options d'unité.
+
+
 
 ## 📁 Les différents fichiers
 
@@ -80,10 +93,13 @@ Tous les fichiers se trouvent dans le dossier `lib`.
 
 - **Pages** :
     - **Home** :
+    - `activity_page.dart` : Page principale reprenant les activités de l'utilisateur. 
+    - `dashboard_page.dart` : Page de tableau de bord de l'utilisateur, résumant les informations importantes.
+    - `main_page.dart` : Page principale du profil de l'utilisateur.
         - **Profile** :
-            - `activity_page.dart` : Affiche les activités de l'utilisateur.
-            - `dashboard_page.dart` : Page de tableau de bord de l'utilisateur, résumant les informations importantes.
-            - `main_page.dart` : Page principale du profil de l'utilisateur.
+            - `activity_tracking_page.dart` : La page concernant les activités de l'utilisateur.
+            - `nutrition_goal_page.dart` : Page ou l'utilisateur peut définir ses objectifs nutritionnels.
+            - `personal_info_page.dart` : Page de profil de l'utilisateur.
         - **Logs** :
             - `home_page.dart` : Page d'accueil de l'application.
             - `login_page.dart` : Page de connexion de l'utilisateur.
@@ -92,6 +108,8 @@ Tous les fichiers se trouvent dans le dossier `lib`.
 - **Models** :
     - `add_food_page.dart` : Page permettant d'ajouter un nouvel aliment via des formulaires.
     - `food.dart` : Modèle de données pour les aliments, définissant les attributs nutritionnels.
+    - `FoodDetailsPage.dart` : Page de détail pour un aliment spécifique, affichant des informations détaillées.
+    - `FoodSearchPage.dart` : Page de recherche d'aliments, permettant aux utilisateurs d'effectuer des recherches d'aliments.
 
 - **Routes** :
     - `app_routes.dart` : Contient les routes de navigation de l'application.
@@ -104,14 +122,14 @@ Tous les fichiers se trouvent dans le dossier `lib`.
 - [ ] Voir dans la TODO page.
 
 ### Bugs à corriger
-- [ ] Optimiser la recherche d'aliments pour de meilleures performances.
-- [ ] Gérer les erreurs de connexion avec Firestore.
+- [ ] N/A
 
 ### Améliorations
 - [ ] Ajouter un système de notifications pour les utilisateurs concernant des objectifs de santé.
 - [ ] Intégrer des fonctionnalités de suivi des exercices physiques.
-- [ ] Permettre aux utilisateurs de définir des objectifs de nutrition personnalisés.
 - [ ] Ajouter la reconnaissance d’aliments par photo.
+- [ ] Améliorer la page add_food_page.dart pour une meilleure expérience utilisateur.
+- [ ] Intégrer des notifications push pour encourager les utilisateurs à rester actifs.
 
 ## 💻 Technologies utilisées
 

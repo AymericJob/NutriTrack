@@ -57,7 +57,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('MyFitnessPal'),
+        title: Text('NutriTrack'),
         backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
@@ -86,7 +86,7 @@ class _MainPageState extends State<MainPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('MyFitnessPal', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                Text('NutriTrack', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
                 Text('Welcome, ${FirebaseAuth.instance.currentUser?.email ?? 'Users'}',
                     style: TextStyle(color: Colors.white70, fontSize: 16)),

@@ -142,7 +142,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Ajouter un aliment'),
-        backgroundColor: Colors.blue,  // Couleur bleue pour l'app bar
+        backgroundColor: Colors.blueAccent,  // Couleur bleue pour l'app bar
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -152,14 +152,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Ajouter un aliment',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,  // Couleur bleue pour le titre
-                  ),
-                ),
                 SizedBox(height: 20),
                 _buildTextField(_nameController, "Nom de l'aliment"),
                 _buildTextField(_caloriesController, "Calories", isNumeric: true),
@@ -172,7 +164,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
                   icon: Icon(Icons.camera_alt, size: 20),
                   label: Text('Scanner un code-barres'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,  // Couleur bleue pour les boutons
+                    backgroundColor: Colors.blueAccent,  // Couleur bleue pour les boutons
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -185,7 +177,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
                   icon: Icon(Icons.search, size: 20),
                   label: Text('Rechercher un aliment'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,  // Couleur bleue pour les boutons
+                    backgroundColor: Colors.blueAccent,  // Couleur bleue pour les boutons
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -197,7 +189,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
                   child: ElevatedButton(
                     onPressed: _submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,  // Couleur bleue pour les boutons
+                      backgroundColor: Colors.blueAccent,  // Couleur bleue pour les boutons
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -225,7 +217,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
         keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.blue),  // Texte en bleu pour les labels
+          labelStyle: TextStyle(color: Colors.blueAccent),  // Texte en bleu pour les labels
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(

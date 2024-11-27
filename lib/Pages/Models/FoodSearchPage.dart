@@ -125,7 +125,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Recherche combinée d'aliments"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
