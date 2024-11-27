@@ -56,7 +56,7 @@ Il existe de nombreuses applications de suivi de l'alimentation sur le marché, 
 
 ![NutriTrack](https://mir-s3-cdn-cf.behance.net/projects/404/436b24196708837.Y3JvcCw5ODM5LDc2OTYsODAzLDA.png)  
 ![NutriTrack](https://cdn.dribbble.com/userupload/2957372/file/original-f46379cab48c97180d43d0b8db289672.png?resize=400x0)
-![NutriTrack](https://images.everydayhealth.com/images/diet-nutrition/weight/lose-it!-review-goals1-406.jpg?sfvrsn=f4a02ac4_3)
+![NutriTrack](https://images.everydayhealth.com/images/diet-nutrition/weight/lose-it-app-review-1440x810.jpg)
 ![NutriTrack](https://cronometer.com/blog/wp-content/uploads/2024/08/870x580-Blog-Image-%E2%80%93-target-settings-1-scaled.jpg)
 ![NutriTrack](https://images.yazio.com/frontend/app-lp/main/composition-ios-fr.png?w=400)
 
