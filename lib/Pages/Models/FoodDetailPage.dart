@@ -3,7 +3,6 @@ import 'package:myfitnesspal/Pages/Home/main_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../Home/dashboard_page.dart';
 import '../models/food.dart';
 
 class FoodDetailPage extends StatefulWidget {
@@ -38,6 +37,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
           'carbs': _calculateValue(widget.food.carbs),
           'fat': _calculateValue(widget.food.fat),
           'protein': _calculateValue(widget.food.protein),
+          'date': Timestamp.now(), // Enregistrer la date actuelle
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Aliment ajouté avec succès")),
@@ -103,7 +103,8 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  contentPadding:
+                  EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -157,9 +158,11 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                    padding:
+                    EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                   ),
-                  child: Text('Ajouter cet aliment', style: TextStyle(fontSize: 18)),
+                  child: Text('Ajouter cet aliment',
+                      style: TextStyle(fontSize: 18)),
                 ),
               ),
             ],
@@ -169,7 +172,8 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
     );
   }
 
-  Widget _buildProgressIndicator(String label, int value, int maxValue, Color color) {
+  Widget _buildProgressIndicator(
+      String label, int value, int maxValue, Color color) {
     double percentage = (value / maxValue).clamp(0.0, 1.0);
 
     return Expanded(

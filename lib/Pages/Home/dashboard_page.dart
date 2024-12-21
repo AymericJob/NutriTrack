@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pedometer/pedometer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import '../models/food.dart';
 import '../Models/add_food_page.dart';
 
@@ -13,10 +12,9 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   List<Food> _foods = [];
-  int _stepsToday = 0;
-  Stream<StepCount>? _stepCountStream;
-  DateTime _lastRecordedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now();
 
+  // Objectifs nutritionnels
   int _calorieGoal = 0;
   int _carbsGoal = 0;
   int _proteinGoal = 0;
@@ -26,7 +24,8 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     _fetchNutritionGoals();
-    _fetchFoods(); // Ajoutez cet appel pour récupérer les aliments
+    _fetchFoodsForDate(
+        _selectedDate); // Récupérer les aliments pour la date actuelle
   }
 
   Future<void> _fetchNutritionGoals() async {
@@ -44,38 +43,43 @@ class _DashboardPageState extends State<DashboardPage> {
             _proteinGoal = doc['protein'] ?? 0;
             _fatGoal = doc['fat'] ?? 0;
           });
-        } else {
-          print("Aucun objectif trouvé pour cet utilisateur.");
         }
       } catch (e) {
         print("Erreur lors de la récupération des objectifs de nutrition: $e");
       }
-    } else {
-      print("Utilisateur non connecté.");
     }
   }
 
-  Future<void> _fetchFoods() async {
+  Future<void> _fetchFoodsForDate(DateTime date) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       try {
+        // Filtrer les aliments par date (ignorer l'heure)
+        DateTime startOfDay = DateTime(date.year, date.month, date.day);
+        DateTime endOfDay =
+        DateTime(date.year, date.month, date.day, 23, 59, 59);
+
         QuerySnapshot snapshot = await FirebaseFirestore.instance
             .collection('users')
             .doc(uid)
             .collection('foods')
+            .where('date',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+            .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
             .get();
 
         List<Food> fetchedFoods = snapshot.docs.map((doc) {
           return Food(
-              name: doc['name'],
-              calories: (doc['calories'] as num).toInt(),
-              carbs: (doc['carbs'] as num).toInt(),
-              fat: (doc['fat'] as num).toInt(),
-              protein: (doc['protein'] as num).toInt());
+            name: doc['name'],
+            calories: (doc['calories'] as num).toInt(),
+            carbs: (doc['carbs'] as num).toInt(),
+            fat: (doc['fat'] as num).toInt(),
+            protein: (doc['protein'] as num).toInt(),
+          );
         }).toList();
 
         setState(() {
-          _foods = fetchedFoods; // Mettez à jour la liste des aliments
+          _foods = fetchedFoods;
         });
       } catch (e) {
         print("Erreur lors de la récupération des aliments: $e");
@@ -102,15 +106,38 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Macros',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+            // Date et boutons de navigation sur la même ligne
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.chevron_left),
+                  onPressed: () {
+                    setState(() {
+                      _selectedDate = _selectedDate.subtract(Duration(days: 1));
+                      _fetchFoodsForDate(_selectedDate);
+                    });
+                  },
+                ),
+                Text(
+                  DateFormat('d MMM yyyy').format(_selectedDate),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: Icon(Icons.chevron_right),
+                  onPressed: () {
+                    setState(() {
+                      _selectedDate = _selectedDate.add(Duration(days: 1));
+                      _fetchFoodsForDate(_selectedDate);
+                    });
+                  },
+                ),
+              ],
             ),
-            SizedBox(height: 10),
+
+            SizedBox(height: 20),
+
+            // Section de Macros
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -125,13 +152,11 @@ class _DashboardPageState extends State<DashboardPage> {
               ],
             ),
             SizedBox(height: 20),
+
+            // Liste des aliments consommés
             Text(
               'Aliments consommés',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Expanded(
               child: ListView.builder(
@@ -139,7 +164,9 @@ class _DashboardPageState extends State<DashboardPage> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(_foods[index].name),
-                    subtitle: Text('Calories: ${_foods[index].calories}'),
+                    subtitle: Text(
+                      'Calories: ${_foods[index].calories} | Glucides: ${_foods[index].carbs}g | Lipides: ${_foods[index].fat}g | Protéines: ${_foods[index].protein}g',
+                    ),
                   );
                 },
               ),
