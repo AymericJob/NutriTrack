@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import '../models/food.dart';
+import 'package:myfitnesspal/Pages/Home/JournalPage.dart';
+import 'package:myfitnesspal/Pages/models/food.dart';
 import '../Models/add_food_page.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -24,8 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     _fetchNutritionGoals();
-    _fetchFoodsForDate(
-        _selectedDate); // Récupérer les aliments pour la date actuelle
+    _fetchFoodsForDate(_selectedDate); // Récupérer les aliments pour la date actuelle
   }
 
   Future<void> _fetchNutritionGoals() async {
@@ -56,15 +56,13 @@ class _DashboardPageState extends State<DashboardPage> {
       try {
         // Filtrer les aliments par date (ignorer l'heure)
         DateTime startOfDay = DateTime(date.year, date.month, date.day);
-        DateTime endOfDay =
-        DateTime(date.year, date.month, date.day, 23, 59, 59);
+        DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
         QuerySnapshot snapshot = await FirebaseFirestore.instance
             .collection('users')
             .doc(uid)
             .collection('foods')
-            .where('date',
-            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+            .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
             .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
             .get();
 
@@ -134,7 +132,6 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ],
             ),
-
             SizedBox(height: 20),
 
             // Section de Macros
@@ -174,18 +171,45 @@ class _DashboardPageState extends State<DashboardPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddFoodPage(onFoodAdded: _addFood),
+      floatingActionButton: Stack(
+        children: <Widget>[
+          // FAB pour Ajouter un Aliment
+          Positioned(
+            bottom: 80, // Décalage vers le bas pour éviter le chevauchement
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddFoodPage(onFoodAdded: _addFood),
+                  ),
+                );
+              },
+              child: Icon(Icons.add),
+              tooltip: 'Ajouter un aliment',
+              backgroundColor: Colors.blue,
             ),
-          );
-        },
-        child: Icon(Icons.add),
-        tooltip: 'Add Food',
-        backgroundColor: Colors.blue,
+          ),
+          // FAB pour Voir le Journal
+          Positioned(
+            bottom: 20, // Décalage du FAB du journal un peu plus bas
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => JournalPage(foods: _foods),
+                  ),
+                );
+              },
+              child: Icon(Icons.pie_chart),
+              tooltip: 'Voir le Journal',
+              backgroundColor: Colors.blue,
+            ),
+          ),
+        ],
       ),
     );
   }
