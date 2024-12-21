@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../models/food.dart';
-import 'FoodDetailPage.dart'; // Assurez-vous que vous avez une page pour afficher les détails de l'aliment.
 
 class ManualSearchPage extends StatefulWidget {
   @override
@@ -55,7 +53,7 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
         'carbs': carbs,
         'fat': fat,
         'protein': protein,
-        'createdAt': Timestamp.now(),
+        'createdAt': Timestamp.now(),  // Date actuelle d'ajout
       });
 
       _showMessage("Aliment ajouté avec succès !");
@@ -87,7 +85,7 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ajouter un aliment"),
+        title: Text("Ajouter un aliment manuellement"),
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
@@ -96,76 +94,45 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
           key: _formKey,
           child: Column(
             children: [
-              // Champ de texte pour le nom de l'aliment
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(labelText: "Nom de l'aliment"),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer le nom de l\'aliment';
-                  }
-                  return null;
-                },
+                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
               ),
-              // Champ de texte pour les calories
               TextFormField(
                 controller: _caloriesController,
-                decoration: InputDecoration(labelText: "Calories"),
+                decoration: InputDecoration(labelText: "Calories (par portion)"),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer les calories';
-                  }
-                  return null;
-                },
+                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
               ),
-              // Champ de texte pour les glucides
               TextFormField(
                 controller: _carbsController,
                 decoration: InputDecoration(labelText: "Glucides (g)"),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer les glucides';
-                  }
-                  return null;
-                },
+                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
               ),
-              // Champ de texte pour les matières grasses
               TextFormField(
                 controller: _fatController,
-                decoration: InputDecoration(labelText: "Matières grasses (g)"),
+                decoration: InputDecoration(labelText: "Graisses (g)"),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer les matières grasses';
-                  }
-                  return null;
-                },
+                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
               ),
-              // Champ de texte pour les protéines
               TextFormField(
                 controller: _proteinController,
                 decoration: InputDecoration(labelText: "Protéines (g)"),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer les protéines';
-                  }
-                  return null;
-                },
+                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
               ),
               SizedBox(height: 20),
-              // Bouton pour ajouter l'aliment
-              ElevatedButton(
-                onPressed: _isLoading ? null : () {
-                  if (_formKey.currentState?.validate() ?? false) {
+              _isLoading
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
                     _addFoodToFirestore();
                   }
                 },
-                child: _isLoading
-                    ? CircularProgressIndicator(color: Colors.white)
-                    : Text("Ajouter l'aliment"),
+                child: Text("Ajouter l'aliment"),
               ),
             ],
           ),
