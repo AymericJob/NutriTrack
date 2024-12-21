@@ -32,7 +32,7 @@ class ActivityTrackingPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Goal'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

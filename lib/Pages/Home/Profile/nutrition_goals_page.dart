@@ -13,7 +13,7 @@ class NutritionGoalsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Nutrition Goals'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.blueAccent,
         elevation: 0,
       ),
       body: Padding(
@@ -58,7 +58,7 @@ class NutritionGoalsPage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => _saveNutritionGoals(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
+                  backgroundColor: Colors.blueAccent,
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),

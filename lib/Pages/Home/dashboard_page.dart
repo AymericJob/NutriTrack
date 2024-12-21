@@ -97,10 +97,6 @@ class _DashboardPageState extends State<DashboardPage> {
     int totalProtein = _foods.fold(0, (sum, food) => sum + food.protein);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Dashboard'),
-        automaticallyImplyLeading: false,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -130,7 +126,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             SizedBox(height: 20),
             Text(
-              'Aliments ajoutés',
+              'Aliments consommés',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

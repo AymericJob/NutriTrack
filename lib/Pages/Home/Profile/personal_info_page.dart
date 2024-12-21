@@ -10,7 +10,7 @@ class PersonalInfoPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Personal Information'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -42,7 +42,7 @@ class PersonalInfoPage extends StatelessWidget {
                   }
                 },
                 child: Text('Save'),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
               ),
             ],
           ),
