@@ -174,7 +174,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FoodDetailPage(food: food),
+                            builder: (context) => FoodDetailPage(food: food, category: '',),
                           ),
                         );
                       },

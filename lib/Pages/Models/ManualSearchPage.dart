@@ -15,6 +15,7 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
   final _fatController = TextEditingController();
   final _proteinController = TextEditingController();
 
+  String? _selectedCategory; // Nouvelle variable pour la catégorie
   bool _isLoading = false;
 
   // Fonction pour ajouter un aliment dans Firestore
@@ -25,8 +26,8 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
     final fat = int.tryParse(_fatController.text) ?? 0;
     final protein = int.tryParse(_proteinController.text) ?? 0;
 
-    if (name.isEmpty || calories == 0 || carbs == 0 || fat == 0 || protein == 0) {
-      _showMessage("Veuillez remplir tous les champs.");
+    if (name.isEmpty || calories == 0 || carbs == 0 || fat == 0 || protein == 0 || _selectedCategory == null) {
+      _showMessage("Veuillez remplir tous les champs et choisir une catégorie.");
       return;
     }
 
@@ -53,7 +54,8 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
         'carbs': carbs,
         'fat': fat,
         'protein': protein,
-        'createdAt': Timestamp.now(),  // Date actuelle d'ajout
+        'category': _selectedCategory, // Ajouter la catégorie
+        'date': Timestamp.now(),  // Date actuelle d'ajout
       });
 
       _showMessage("Aliment ajouté avec succès !");
@@ -74,6 +76,9 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
     _carbsController.clear();
     _fatController.clear();
     _proteinController.clear();
+    setState(() {
+      _selectedCategory = null;
+    });
   }
 
   // Afficher un message d'alerte
@@ -122,6 +127,24 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
                 decoration: InputDecoration(labelText: "Protéines (g)"),
                 keyboardType: TextInputType.number,
                 validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
+              ),
+              SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                decoration: InputDecoration(labelText: "Catégorie"),
+                items: ['Déjeuner', 'Dîner', 'Souper', 'Snack']
+                    .map((category) => DropdownMenuItem<String>(
+                  value: category,
+                  child: Text(category),
+                ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedCategory = value;
+                  });
+                },
+                validator: (value) =>
+                value == null ? "Veuillez choisir une catégorie" : null,
               ),
               SizedBox(height: 20),
               _isLoading

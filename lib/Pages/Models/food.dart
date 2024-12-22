@@ -6,8 +6,9 @@ class Food {
   final int protein;
   final String? brand;
   final String? quantity;
-  final String? sourceApi; // Ajout pour savoir d'où viennent les données
+  final String? sourceApi;
   final String? imageUrl;
+  final String? category; // Nouvelle propriété pour la catégorie
 
   Food({
     required this.name,
@@ -19,5 +20,6 @@ class Food {
     this.quantity,
     this.sourceApi,
     this.imageUrl,
+    this.category,
   });
 }

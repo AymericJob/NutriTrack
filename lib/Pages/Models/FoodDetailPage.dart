@@ -8,23 +8,25 @@ import '../models/food.dart';
 class FoodDetailPage extends StatefulWidget {
   final Food food;
 
-  const FoodDetailPage({Key? key, required this.food}) : super(key: key);
+  const FoodDetailPage({Key? key, required this.food, required String category})
+      : super(key: key);
+
   @override
   _FoodDetailPageState createState() => _FoodDetailPageState();
 }
 
 class _FoodDetailPageState extends State<FoodDetailPage> {
   double _quantity = 1.0;
+  String _selectedMeal = "Petit-déjeuner"; // Par défaut
 
-  // Méthode pour mettre à jour les valeurs nutritionnelles en fonction de la quantité
+  // Méthode pour calculer les valeurs nutritionnelles
   int _calculateValue(int baseValue) {
     return (baseValue * _quantity).round();
   }
 
-  // Méthode pour ajouter l'aliment aux données utilisateur et rediriger vers DashboardPage
+  // Méthode pour ajouter l'aliment avec le repas sélectionné
   Future<void> _addFood() async {
     try {
-      // Logique pour ajouter l'aliment à Firestore
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid != null) {
         await FirebaseFirestore.instance
@@ -37,13 +39,14 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
           'carbs': _calculateValue(widget.food.carbs),
           'fat': _calculateValue(widget.food.fat),
           'protein': _calculateValue(widget.food.protein),
-          'date': Timestamp.now(), // Enregistrer la date actuelle
+          'meal': _selectedMeal, // Repas sélectionné
+          'date': Timestamp.now(),
         });
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Aliment ajouté avec succès")),
         );
 
-        // Redirection vers DashboardPage après l'ajout
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => MainPage()),
@@ -113,19 +116,48 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 },
               ),
               SizedBox(height: 20),
+              Text(
+                "Sélectionnez un repas :",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              DropdownButton<String>(
+                value: _selectedMeal,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedMeal = newValue!;
+                  });
+                },
+                items: <String>[
+                  "Petit-déjeuner",
+                  "Déjeuner",
+                  "Dîner",
+                  "Collation"
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                isExpanded: true,
+                underline: Container(
+                  height: 2,
+                  color: Colors.blueAccent,
+                ),
+              ),
+              SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildProgressIndicator(
                     "Calories",
                     _calculateValue(widget.food.calories),
-                    2000, // Apport journalier recommandé (AJR)
+                    2000, // AJR
                     Colors.orange,
                   ),
                   _buildProgressIndicator(
                     "Carbs",
                     _calculateValue(widget.food.carbs),
-                    300, // AJR pour les glucides en grammes
+                    300, // AJR pour glucides
                     Colors.blue,
                   ),
                 ],
@@ -137,13 +169,13 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   _buildProgressIndicator(
                     "Graisses",
                     _calculateValue(widget.food.fat),
-                    70, // AJR pour les graisses en grammes
+                    70, // AJR pour graisses
                     Colors.red,
                   ),
                   _buildProgressIndicator(
                     "Protéines",
                     _calculateValue(widget.food.protein),
-                    50, // AJR pour les protéines en grammes
+                    50, // AJR pour protéines
                     Colors.green,
                   ),
                 ],

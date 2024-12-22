@@ -51,7 +51,7 @@ class AppRoutes {
       case foodDetailsPage:
         if (settings.arguments is Food) {
           final food = settings.arguments as Food;
-          return MaterialPageRoute(builder: (_) => FoodDetailPage(food: food));
+          return MaterialPageRoute(builder: (_) => FoodDetailPage(food: food, category: '',));
         }
         return _errorRoute();
 

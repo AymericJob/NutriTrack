@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert'; // Pour convertir la réponse en JSON
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:barcode_scan2/barcode_scan2.dart'; // Import du scanner
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:myfitnesspal/Pages/Models/ManualSearchPage.dart';
 import '../models/food.dart';
 import 'FoodDetailPage.dart';
 
-
 class AddFoodPage extends StatefulWidget {
-  const AddFoodPage({Key? key, required void Function(Food food) onFoodAdded}) : super(key: key);
+  final void Function(Food food) onFoodAdded;
+
+  const AddFoodPage({Key? key, required this.onFoodAdded}) : super(key: key);
 
   @override
   _AddFoodPageState createState() => _AddFoodPageState();
@@ -21,7 +22,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
   List<Food> _foodList = [];
   bool _isLoading = false;
 
-  // Fonction pour rechercher des aliments via l'API Open Food Facts
   Future<void> _searchFoods() async {
     setState(() {
       _isLoading = true;
@@ -43,19 +43,16 @@ class _AddFoodPageState extends State<AddFoodPage> {
             foodList.add(Food(
               name: product['product_name'] ?? 'Inconnu',
               calories: int.tryParse(
-                  product['nutriments']['energy-kcal_100g']?.toString() ??
-                      '0') ??
+                  product['nutriments']['energy-kcal_100g']?.toString() ?? '0') ??
                   0,
-              carbs: int.tryParse(product['nutriments']['carbohydrates_100g']
-                  ?.toString() ??
-                  '0') ??
+              carbs: int.tryParse(
+                  product['nutriments']['carbohydrates_100g']?.toString() ?? '0') ??
                   0,
               fat: int.tryParse(
                   product['nutriments']['fat_100g']?.toString() ?? '0') ??
                   0,
               protein: int.tryParse(
-                  product['nutriments']['proteins_100g']?.toString() ??
-                      '0') ??
+                  product['nutriments']['proteins_100g']?.toString() ?? '0') ??
                   0,
               imageUrl: product['image_url'] ?? '',
               sourceApi: 'Open Food Facts',
@@ -86,12 +83,10 @@ class _AddFoodPageState extends State<AddFoodPage> {
     }
   }
 
-  // Afficher un message d'alerte
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  // Fonction pour scanner un code-barres
   Future<void> _scanBarcode() async {
     try {
       final scanResult = await BarcodeScanner.scan();
@@ -100,7 +95,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
         setState(() {
           _searchController.text = scanResult.rawContent;
         });
-        await _searchFoods(); // Recherche automatique après le scan
+        await _searchFoods();
       }
     } catch (e) {
       _showMessage("Erreur lors du scan du code-barres.");
@@ -118,7 +113,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Champ de texte pour la recherche
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -130,8 +124,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
               ),
             ),
             SizedBox(height: 20),
-
-            // Boutons supplémentaires
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -161,8 +153,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
               ],
             ),
             SizedBox(height: 20),
-
-            // Affichage des aliments recherchés
             _isLoading
                 ? Center(child: CircularProgressIndicator())
                 : Expanded(
@@ -185,8 +175,10 @@ class _AddFoodPageState extends State<AddFoodPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                FoodDetailPage(food: food)),
+                          builder: (context) => FoodDetailPage(
+                            food: food, category: '',
+                          ),
+                        ),
                       );
                     },
                   );
