@@ -21,13 +21,22 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
   // Fonction pour ajouter un aliment dans Firestore
   Future<void> _addFoodToFirestore() async {
     final name = _nameController.text;
-    final calories = int.tryParse(_caloriesController.text) ?? 0;
-    final carbs = int.tryParse(_carbsController.text) ?? 0;
-    final fat = int.tryParse(_fatController.text) ?? 0;
-    final protein = int.tryParse(_proteinController.text) ?? 0;
+    final calories = _caloriesController.text.isNotEmpty
+        ? int.tryParse(_caloriesController.text)
+        : null;
+    final carbs = _carbsController.text.isNotEmpty
+        ? int.tryParse(_carbsController.text)
+        : null;
+    final fat = _fatController.text.isNotEmpty
+        ? int.tryParse(_fatController.text)
+        : null;
+    final protein = _proteinController.text.isNotEmpty
+        ? int.tryParse(_proteinController.text)
+        : null;
 
-    if (name.isEmpty || calories == 0 || carbs == 0 || fat == 0 || protein == 0 || _selectedCategory == null) {
-      _showMessage("Veuillez remplir tous les champs et choisir une catégorie.");
+    // Vérification que le nom et la catégorie sont remplis
+    if (name.isEmpty || _selectedCategory == null) {
+      _showMessage("Veuillez remplir tous les champs obligatoires.");
       return;
     }
 
@@ -36,7 +45,7 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
     });
 
     try {
-      // Récupérer l'ID de l'utilisateur actuellement connecté
+      // Récupérer l'utilisateur actuellement connecté
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         _showMessage("Vous devez être connecté pour ajouter un aliment.");
@@ -50,10 +59,10 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
       // Créer un document pour l'aliment avec les informations fournies
       await foodRef.add({
         'name': name,
-        'calories': calories,
-        'carbs': carbs,
-        'fat': fat,
-        'protein': protein,
+        'calories': calories ?? 0, // Utilise 0 si vide
+        'carbs': carbs ?? 0, // Utilise 0 si vide
+        'fat': fat ?? 0, // Utilise 0 si vide
+        'protein': protein ?? 0, // Utilise 0 si vide
         'category': _selectedCategory, // Ajouter la catégorie
         'date': Timestamp.now(),  // Date actuelle d'ajout
       });
@@ -108,25 +117,21 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
                 controller: _caloriesController,
                 decoration: InputDecoration(labelText: "Calories (par portion)"),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
               ),
               TextFormField(
                 controller: _carbsController,
                 decoration: InputDecoration(labelText: "Glucides (g)"),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
               ),
               TextFormField(
                 controller: _fatController,
                 decoration: InputDecoration(labelText: "Graisses (g)"),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
               ),
               TextFormField(
                 controller: _proteinController,
                 decoration: InputDecoration(labelText: "Protéines (g)"),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
               ),
               SizedBox(height: 20),
               DropdownButtonFormField<String>(
