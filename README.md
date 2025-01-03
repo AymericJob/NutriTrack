@@ -1,6 +1,6 @@
 # NutriTrack
 
-MyFitnessPal est une application Flutter conçue pour aider les utilisateurs à gérer leur alimentation et leur santé de manière simple et efficace.
+NutriTrack est une application Flutter conçue pour aider les utilisateurs à gérer leur alimentation et leur santé de manière simple et efficace.
 
 ## 🔍 Aperçu de notre application
 
