@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../Routes/app_routes.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -18,20 +19,48 @@ class RegisterPage extends StatelessWidget {
     String password = _passwordController.text.trim();
     String confirmPassword = _confirmPasswordController.text.trim();
 
+    // Vérifier si les mots de passe correspondent
     if (password != confirmPassword) {
       _showMessage(context, "Passwords do not match");
       return;
     }
 
     try {
+      // Création de l'utilisateur dans Firebase Auth
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      // Redirection vers MainPage
-      Navigator.of(context).pushReplacementNamed(AppRoutes.mainPage);
+
+      // Récupération de l'utilisateur authentifié
+      User? user = userCredential.user;
+
+      if (user != null) {
+        // Créer le document de l'utilisateur dans Firestore
+        try {
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+            'email': email,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+          // Affichage d'un message de succès
+          _showMessage(context, "User created successfully in Firestore!");
+
+          // Redirection vers la page principale après l'inscription réussie
+          Navigator.of(context).pushReplacementNamed(AppRoutes.mainPage);
+        } catch (e) {
+          _showMessage(context, "Error creating user in Firestore: $e");
+        }
+      }
     } catch (e) {
-      _showMessage(context, 'Registration failed: ${e.toString()}');
+      // En cas d'erreur d'inscription
+      String message = 'Registration failed: ';
+      if (e is FirebaseAuthException) {
+        message += e.message ?? 'Unknown error';
+      } else {
+        message += e.toString();
+      }
+      _showMessage(context, message);
     }
   }
 
@@ -42,7 +71,7 @@ class RegisterPage extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue.shade400, Colors.purple.shade300],
+            colors: [Colors.blue.shade400, Colors.blueAccent],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),

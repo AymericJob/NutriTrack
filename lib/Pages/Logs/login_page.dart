@@ -57,7 +57,7 @@ class LoginPage extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue.shade400, Colors.purple.shade300],
+            colors: [Colors.blue.shade400, Colors.blueAccent],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -72,7 +72,7 @@ class LoginPage extends StatelessWidget {
                 child: IconButton(
                   icon: Icon(Icons.arrow_back, color: Colors.white, size: 30), // Flèche blanche
                   onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/homepage'); // Remplacez '/homepage' par le nom de votre route home_page.
+                    Navigator.of(context).pushReplacementNamed('/homepage');
                   },
                 ),
               ),
@@ -110,7 +110,6 @@ class LoginPage extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () => _login(context),
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.blue.shade700,
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -122,11 +121,11 @@ class LoginPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade700,
                         ),
                       ),
                     ),
                     SizedBox(height: 10),
-                    // Lien "Mot de passe oublié"
                     TextButton(
                       onPressed: () => _resetPassword(context),
                       child: Text(
@@ -134,13 +133,13 @@ class LoginPage extends StatelessWidget {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    // Lien pour s'inscrire
+                    SizedBox(height: 10),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed(AppRoutes.registerPage);
+                        Navigator.of(context).pushReplacementNamed(AppRoutes.registerPage);
                       },
                       child: Text(
-                        "Don't have an account? Sign Up",
+                        'Don\'t have an account? Sign Up',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),

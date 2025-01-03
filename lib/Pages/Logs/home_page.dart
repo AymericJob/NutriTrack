@@ -9,7 +9,7 @@ class HomePage extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue.shade400, Colors.purple.shade300],
+            colors: [Colors.blue.shade400, Colors.blueAccent],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -18,10 +18,6 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/images/your_image.png',
-                height: 300,
-              ),
               SizedBox(height: 40),
               Text(
                 "Bienvenue dans l'App",
