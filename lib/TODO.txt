@@ -45,3 +45,25 @@ Je me suis arêter sur le fait que lorsque je rentre un aliment je ne veux pouvo
 -->Regarder pour changer la page d'ajout d'aliments et plutôt de faire une barre de recherche en haut qui correspond a ma recherche par api et avoir 2 boutons pour soit faire une recherche en dur ou alors de passer par le qr code...
 -->Il faut donc remanier le code mais il faut aussi supprimer la page FoodSearchpage et mettre le code dans Addfoodpage...
 Prochaine étape regarder pour faire le journal au jour le jours et faire un système de défilement pour voir les jours précédents....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------
+
+
+
+Notification
+Avoir un stockage locale et quand je me reconnecte cela actualise tout dans firestore ? C'est possible ?
