@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'NotificationsPage.dart';
 import 'dashboard_page.dart';
 import 'activity_page.dart';
 import 'Profile/profile_page.dart';
@@ -63,7 +64,11 @@ class _MainPageState extends State<MainPage> {
           IconButton(
             icon: Icon(Icons.notifications),
             onPressed: () {
-              // Action pour les notifications
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => NotificationsPage(), // Redirige vers NotificationsPage
+                ),
+              );
             },
           ),
         ],
@@ -88,7 +93,7 @@ class _MainPageState extends State<MainPage> {
               children: [
                 Text('NutriTrack', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
-                Text('Welcome, ${FirebaseAuth.instance.currentUser?.email ?? 'Users'}',
+                Text('Welcome, ${FirebaseAuth.instance.currentUser?.email ?? 'User'}',
                     style: TextStyle(color: Colors.white70, fontSize: 16)),
               ],
             ),
@@ -140,7 +145,7 @@ class _MainPageState extends State<MainPage> {
           ),
           label: 'Activity',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
     );
   }
