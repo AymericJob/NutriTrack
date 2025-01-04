@@ -13,63 +13,79 @@ class NutritionGoalsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Nutrition Goals'),
-        backgroundColor: Colors.blueAccent,
-        elevation: 0,
+        backgroundColor: Colors.blue.shade700,
+        elevation: 4,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Set Your Daily Nutrition Goals',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            _buildGoalSection(
-              title: 'Total Calories',
-              hintText: 'Enter daily calories',
-              controller: _caloriesController,
-              unit: 'kcal',
-            ),
-            SizedBox(height: 20),
-            _buildGoalSection(
-              title: 'Protein',
-              hintText: 'Enter daily protein',
-              controller: _proteinController,
-              unit: 'g',
-            ),
-            SizedBox(height: 20),
-            _buildGoalSection(
-              title: 'Carbohydrates',
-              hintText: 'Enter daily carbs',
-              controller: _carbsController,
-              unit: 'g',
-            ),
-            SizedBox(height: 20),
-            _buildGoalSection(
-              title: 'Fat',
-              hintText: 'Enter daily fat',
-              controller: _fatController,
-              unit: 'g',
-            ),
-            Spacer(),
-            Center(
-              child: ElevatedButton(
-                onPressed: () => _saveNutritionGoals(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text('Save Goals', style: TextStyle(fontSize: 18)),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              SizedBox(height: 30),
+              _buildGoalSection(
+                title: 'Total Calories',
+                hintText: 'Enter daily calories',
+                controller: _caloriesController,
+                unit: 'kcal',
+                icon: Icons.local_fire_department_outlined,
+                color: Colors.orange.shade400,
               ),
-            ),
-          ],
+              SizedBox(height: 20),
+              _buildGoalSection(
+                title: 'Protein',
+                hintText: 'Enter daily protein',
+                controller: _proteinController,
+                unit: 'g',
+                icon: Icons.fitness_center_outlined,
+                color: Colors.green.shade400,
+              ),
+              SizedBox(height: 20),
+              _buildGoalSection(
+                title: 'Carbohydrates',
+                hintText: 'Enter daily carbs',
+                controller: _carbsController,
+                unit: 'g',
+                icon: Icons.grain_outlined,
+                color: Colors.blue.shade400,
+              ),
+              SizedBox(height: 20),
+              _buildGoalSection(
+                title: 'Fat',
+                hintText: 'Enter daily fat',
+                controller: _fatController,
+                unit: 'g',
+                icon: Icons.lunch_dining_outlined,
+                color: Colors.red.shade400,
+              ),
+              SizedBox(height: 30),
+              _buildSaveButton(context),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Set Your Daily Nutrition Goals',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.blue.shade700,
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          'Track your calorie, protein, carbohydrate, and fat intake to stay on top of your nutrition.',
+          style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+        ),
+      ],
     );
   }
 
@@ -78,30 +94,83 @@ class NutritionGoalsPage extends StatelessWidget {
     required String hintText,
     required TextEditingController controller,
     required String unit,
+    required IconData icon,
+    required Color color,
   }) {
     return Card(
-      elevation: 3,
+      elevation: 6,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-            SizedBox(height: 10),
-            TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: hintText,
-                suffixText: unit,
-                suffixStyle: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 30,
+                color: color,
+              ),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: controller,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 12,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      hintText: hintText,
+                      suffixText: unit,
+                      suffixStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton(BuildContext context) {
+    return Center(
+      child: ElevatedButton.icon(
+        onPressed: () => _saveNutritionGoals(context),
+        icon: Icon(Icons.save_outlined),
+        label: Text('Save Goals'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue.shade700,
+          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: TextStyle(fontSize: 18),
         ),
       ),
     );
@@ -114,7 +183,6 @@ class NutritionGoalsPage extends StatelessWidget {
       final int carbs = int.tryParse(_carbsController.text) ?? 0;
       final int fat = int.tryParse(_fatController.text) ?? 0;
 
-      // Get the current user
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -123,7 +191,6 @@ class NutritionGoalsPage extends StatelessWidget {
         return;
       }
 
-      // Save nutrition goals under the user's document ID
       await FirebaseFirestore.instance.collection('nutrition_goals').doc(user.uid).set({
         'calories': calories,
         'protein': protein,
@@ -131,16 +198,20 @@ class NutritionGoalsPage extends StatelessWidget {
         'fat': fat,
       });
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Nutrition goals saved!')),
+        SnackBar(
+          content: Text('Nutrition goals saved!'),
+          backgroundColor: Colors.green.shade600,
+        ),
       );
     } catch (e) {
       print('Error saving goals: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save goals')),
+        SnackBar(
+          content: Text('Failed to save goals'),
+          backgroundColor: Colors.red.shade600,
+        ),
       );
     }
   }
-
 }
