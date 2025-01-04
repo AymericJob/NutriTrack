@@ -54,7 +54,6 @@ class _DashboardPageState extends State<DashboardPage> {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       try {
-        // Filtrer les aliments par date (ignorer l'heure)
         DateTime startOfDay = DateTime(date.year, date.month, date.day);
         DateTime endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
@@ -85,6 +84,42 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _deleteFood(Food food) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      try {
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('foods')
+            .where('name', isEqualTo: food.name)
+            .where('calories', isEqualTo: food.calories)
+            .where('carbs', isEqualTo: food.carbs)
+            .where('fat', isEqualTo: food.fat)
+            .where('protein', isEqualTo: food.protein)
+            .get();
+
+        // Supprimer tous les documents correspondants
+        for (var doc in snapshot.docs) {
+          await doc.reference.delete();
+        }
+
+        setState(() {
+          _foods.remove(food);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Aliment supprimé avec succès.')),
+        );
+      } catch (e) {
+        print("Erreur lors de la suppression de l'aliment: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Impossible de supprimer l\'aliment.')),
+        );
+      }
+    }
+  }
+
   void _addFood(Food food) {
     setState(() {
       _foods.add(food);
@@ -104,7 +139,6 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date et boutons de navigation sur la même ligne
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -134,7 +168,6 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             SizedBox(height: 20),
 
-            // Section de Macros
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -150,7 +183,6 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             SizedBox(height: 20),
 
-            // Liste des aliments consommés
             Text(
               'Aliments consommés',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -159,10 +191,23 @@ class _DashboardPageState extends State<DashboardPage> {
               child: ListView.builder(
                 itemCount: _foods.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(_foods[index].name),
-                    subtitle: Text(
-                      'Calories: ${_foods[index].calories} | Glucides: ${_foods[index].carbs}g | Lipides: ${_foods[index].fat}g | Protéines: ${_foods[index].protein}g',
+                  return Dismissible(
+                    key: UniqueKey(),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                    onDismissed: (direction) {
+                      _deleteFood(_foods[index]);
+                    },
+                    child: ListTile(
+                      title: Text(_foods[index].name),
+                      subtitle: Text(
+                        'Calories: ${_foods[index].calories} | Glucides: ${_foods[index].carbs}g | Lipides: ${_foods[index].fat}g | Protéines: ${_foods[index].protein}g',
+                      ),
                     ),
                   );
                 },
@@ -173,9 +218,8 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       floatingActionButton: Stack(
         children: <Widget>[
-          // FAB pour Ajouter un Aliment
           Positioned(
-            bottom: 80, // Décalage vers le bas pour éviter le chevauchement
+            bottom: 80,
             right: 20,
             child: FloatingActionButton(
               onPressed: () {
@@ -191,9 +235,8 @@ class _DashboardPageState extends State<DashboardPage> {
               backgroundColor: Colors.blue,
             ),
           ),
-          // FAB pour Voir le Journal
           Positioned(
-            bottom: 20, // Décalage du FAB du journal un peu plus bas
+            bottom: 20,
             right: 20,
             child: FloatingActionButton(
               onPressed: () {
