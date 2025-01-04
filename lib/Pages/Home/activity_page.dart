@@ -11,7 +11,7 @@ class ActivityPage extends StatefulWidget {
 
 class _ActivityPageState extends State<ActivityPage> {
   int _stepsToday = 0;
-  int _stepGoal = 0; // Daily goal
+  int _stepGoal = 0;
   Stream<StepCount>? _stepCountStream;
   DateTime _lastRecordedDate = DateTime.now();
 
@@ -65,36 +65,36 @@ class _ActivityPageState extends State<ActivityPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              SizedBox(height: 16),
-              _buildStepsCard(),
-              SizedBox(height: 16),
-              _buildSetGoalButton(context),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Keep walking to reach your goal!',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+          child: RefreshIndicator(
+            onRefresh: _fetchStepGoal,
+            child: ListView(
+              children: [
+                SizedBox(height: 16),
+                _buildStepsCard(),
+                SizedBox(height: 16),
+                SizedBox(height: 16),
+                LinearProgressIndicator(
+                  value: _stepGoal > 0 ? _stepsToday / _stepGoal : 0,
+                  backgroundColor: Colors.grey[300],
+                  color: Colors.blueAccent,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  '${((_stepsToday / _stepGoal) * 100).toStringAsFixed(1)}% of your goal',
+                  style: TextStyle(fontSize: 14, color: Colors.green),
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'Keep walking to reach your goal!',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Text(
-      'Activity Tracker',
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
       ),
     );
   }
@@ -138,20 +138,6 @@ class _ActivityPageState extends State<ActivityPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSetGoalButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ActivityTrackingPage(),
-          ),
-        ).then((_) => _fetchStepGoal()); // Refresh goal after returning
-      },
-      child: Text('Set New Goal'),
     );
   }
 }
