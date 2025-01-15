@@ -8,7 +8,7 @@ import '../Pages/Home/Profile/profile_page.dart';
 import '../Pages/Home/Profile/personal_info_page.dart';
 import '../Pages/Home/Profile/nutrition_goals_page.dart';
 import '../Pages/Home/Profile/activity_tracking_page.dart';
-import '../Pages/Models/FoodDetailPage.dart';
+import '../Pages/models/FoodDetailPage.dart';
 import '../Pages/models/food.dart'; // Ajoute cet import pour la page de détails
 
 class AppRoutes {
@@ -53,7 +53,7 @@ class AppRoutes {
       case foodDetailsPage:
         if (settings.arguments is Food) {
           final food = settings.arguments as Food;
-          return MaterialPageRoute(builder: (_) => FoodDetailPage(food: food, category: '',));
+          return MaterialPageRoute(builder: (_) => FoodDetailPage(food: food, meal: '',));
         }
         return _errorRoute();
 
