@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Food {
   final String name;
   final int calories;
@@ -8,7 +10,7 @@ class Food {
   final String? quantity;
   final String? sourceApi;
   final String? imageUrl;
-  final String? category; // Nouvelle propriété pour la catégorie
+  final String meal; // Nouvelle propriété pour le repas
 
   Food({
     required this.name,
@@ -20,6 +22,7 @@ class Food {
     this.quantity,
     this.sourceApi,
     this.imageUrl,
-    this.category,
+    required this.meal,
   });
+
 }

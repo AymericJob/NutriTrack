@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:myfitnesspal/Pages/Home/Journal.dart';
 import 'package:myfitnesspal/Pages/Home/JournalPage.dart';
 import 'package:myfitnesspal/Pages/models/food.dart';
 import '../Models/add_food_page.dart';
@@ -72,6 +73,7 @@ class _DashboardPageState extends State<DashboardPage> {
             carbs: (doc['carbs'] as num).toInt(),
             fat: (doc['fat'] as num).toInt(),
             protein: (doc['protein'] as num).toInt(),
+            meal: doc['meal'] ?? '', // Assure-toi que "meal" existe
           );
         }).toList();
 
@@ -84,46 +86,15 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  Future<void> _deleteFood(Food food) async {
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      try {
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .collection('foods')
-            .where('name', isEqualTo: food.name)
-            .where('calories', isEqualTo: food.calories)
-            .where('carbs', isEqualTo: food.carbs)
-            .where('fat', isEqualTo: food.fat)
-            .where('protein', isEqualTo: food.protein)
-            .get();
-
-        // Supprimer tous les documents correspondants
-        for (var doc in snapshot.docs) {
-          await doc.reference.delete();
-        }
-
-        setState(() {
-          _foods.remove(food);
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Aliment supprimé avec succès.')),
-        );
-      } catch (e) {
-        print("Erreur lors de la suppression de l'aliment: $e");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Impossible de supprimer l\'aliment.')),
-        );
+  Map<String, List<Food>> _groupFoodsByMeal() {
+    Map<String, List<Food>> groupedFoods = {};
+    for (var food in _foods) {
+      if (!groupedFoods.containsKey(food.meal)) {
+        groupedFoods[food.meal] = [];
       }
+      groupedFoods[food.meal]!.add(food);
     }
-  }
-
-  void _addFood(Food food) {
-    setState(() {
-      _foods.add(food);
-    });
+    return groupedFoods;
   }
 
   @override
@@ -133,12 +104,15 @@ class _DashboardPageState extends State<DashboardPage> {
     int totalFat = _foods.fold(0, (sum, food) => sum + food.fat);
     int totalProtein = _foods.fold(0, (sum, food) => sum + food.protein);
 
+    Map<String, List<Food>> groupedFoods = _groupFoodsByMeal();
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Date et boutons de navigation
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -168,6 +142,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             SizedBox(height: 20),
 
+            // Section des macros
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -183,74 +158,119 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             SizedBox(height: 20),
 
+            // Aliments consommés par catégories
             Text(
               'Aliments consommés',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: _foods.length,
-                itemBuilder: (context, index) {
-                  return Dismissible(
-                    key: UniqueKey(),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Icon(Icons.delete, color: Colors.white),
-                    ),
-                    onDismissed: (direction) {
-                      _deleteFood(_foods[index]);
-                    },
-                    child: ListTile(
-                      title: Text(_foods[index].name),
-                      subtitle: Text(
-                        'Calories: ${_foods[index].calories} | Glucides: ${_foods[index].carbs}g | Lipides: ${_foods[index].fat}g | Protéines: ${_foods[index].protein}g',
+              child: ListView(
+                children: groupedFoods.entries.map((entry) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        entry.key, // Nom du repas (ex. : Petit-déjeuner)
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[700],
+                        ),
                       ),
-                    ),
+                      ...entry.value.map((food) {
+                        return Dismissible(
+                          key: Key(food.name), // Utilise un identifiant unique
+                          background: Container(
+                            color: Colors.red, // Fond rouge pour signaler la suppression
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 20.0),
+                              child: Icon(Icons.delete, color: Colors.white),
+                            ),
+                          ),
+                          direction: DismissDirection.endToStart, // Glisse pour supprimer
+                          onDismissed: (direction) async {
+                            // Supprimer l'aliment de Firestore
+                            String? uid = FirebaseAuth.instance.currentUser?.uid;
+                            if (uid != null) {
+                              try {
+                                // Supprimer le document correspondant à cet aliment
+                                await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(uid)
+                                    .collection('foods')
+                                    .doc(food.name) // Utiliser le nom ou un ID unique
+                                    .delete();
+
+                                // Mettre à jour l'interface pour refléter la suppression
+                                setState(() {
+                                  _foods.remove(food);
+                                });
+                              } catch (e) {
+                                print("Erreur lors de la suppression de l'aliment: $e");
+                              }
+                            }
+                          },
+                          child: ListTile(
+                            title: Text(food.name),
+                            subtitle: Text(
+                              'Calories: ${food.calories} | Glucides: ${food.carbs}g | Lipides: ${food.fat}g | Protéines: ${food.protein}g',
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
                   );
-                },
+                }).toList(),
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton: Stack(
-        children: <Widget>[
-          Positioned(
-            bottom: 80,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddFoodPage(onFoodAdded: _addFood),
-                  ),
-                );
-              },
-              child: Icon(Icons.add),
-              tooltip: 'Ajouter un aliment',
-              backgroundColor: Colors.blue,
-            ),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => JournalPage(foods: _foods),
+                ),
+              );
+            },
+            child: Icon(Icons.pie_chart),
+            backgroundColor: Colors.green,
           ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => JournalPage(foods: _foods),
-                  ),
-                );
-              },
-              child: Icon(Icons.pie_chart),
-              tooltip: 'Voir le Journal',
-              backgroundColor: Colors.blue,
-            ),
+          SizedBox(height: 10),
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Journal(foods: _foods),
+                ),
+              );
+            },
+            child: Icon(Icons.book),
+            backgroundColor: Colors.orange,
+          ),
+          SizedBox(height: 10),
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddFoodPage(onFoodAdded: (food) {
+                    setState(() {
+                      _foods.add(food);
+                    });
+                  }),
+                ),
+              );
+            },
+            child: Icon(Icons.add),
+            backgroundColor: Colors.blue,
           ),
         ],
       ),
@@ -258,22 +278,19 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildCircularProgressIndicator(
-      String title, int currentValue, int goalValue, Color color) {
+      String label, int current, int goal, Color color) {
     return Column(
       children: [
-        Text(
-          title,
-          style: TextStyle(color: Colors.black54),
-        ),
-        SizedBox(height: 5),
         CircularProgressIndicator(
-          value: goalValue > 0 ? currentValue / goalValue : 0,
-          backgroundColor: Colors.grey[300],
+          value: goal == 0 ? 0 : current / goal,
+          backgroundColor: color.withOpacity(0.2),
           valueColor: AlwaysStoppedAnimation<Color>(color),
-          strokeWidth: 8,
         ),
-        SizedBox(height: 5),
-        Text('$currentValue / $goalValue'),
+        SizedBox(height: 8),
+        Text(
+          '$label: $current/${goal > 0 ? goal : 0}',
+          style: TextStyle(fontSize: 12, color: color),
+        ),
       ],
     );
   }

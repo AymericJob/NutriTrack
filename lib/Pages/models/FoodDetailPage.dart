@@ -8,8 +8,7 @@ import '../models/food.dart';
 class FoodDetailPage extends StatefulWidget {
   final Food food;
 
-  const FoodDetailPage({Key? key, required this.food, required String category})
-      : super(key: key);
+  const FoodDetailPage({Key? key, required this.food, required String meal}) : super(key: key);
 
   @override
   _FoodDetailPageState createState() => _FoodDetailPageState();
@@ -17,9 +16,9 @@ class FoodDetailPage extends StatefulWidget {
 
 class _FoodDetailPageState extends State<FoodDetailPage> {
   double _quantity = 1.0;
-  String _selectedMeal = "Petit-déjeuner"; // Par défaut
+  String _selectedMeal = "Petit-déjeuner"; // Repas par défaut
 
-  // Méthode pour calculer les valeurs nutritionnelles
+  // Méthode pour calculer les valeurs nutritionnelles ajustées
   int _calculateValue(int baseValue) {
     return (baseValue * _quantity).round();
   }
@@ -39,12 +38,12 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
           'carbs': _calculateValue(widget.food.carbs),
           'fat': _calculateValue(widget.food.fat),
           'protein': _calculateValue(widget.food.protein),
-          'meal': _selectedMeal, // Repas sélectionné
+          'meal': _selectedMeal, // Le repas sélectionné
           'date': Timestamp.now(),
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Aliment ajouté avec succès")),
+          SnackBar(content: Text("Aliment ajouté avec succès !")),
         );
 
         Navigator.pushReplacement(
@@ -53,12 +52,12 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur : utilisateur non authentifié")),
+          SnackBar(content: Text("Erreur : utilisateur non authentifié.")),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur lors de l'ajout de l'aliment")),
+        SnackBar(content: Text("Erreur lors de l'ajout de l'aliment.")),
       );
       print("Erreur lors de l'ajout de l'aliment : $e");
     }
@@ -94,7 +93,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
               ),
               SizedBox(height: 20),
               Text(
-                "Quantité (en portions):",
+                "Quantité (en portions) :",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               TextField(
@@ -151,7 +150,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   _buildProgressIndicator(
                     "Calories",
                     _calculateValue(widget.food.calories),
-                    2000, // AJR
+                    2000, // AJR (Apports Journaliers Recommandés)
                     Colors.orange,
                   ),
                   _buildProgressIndicator(

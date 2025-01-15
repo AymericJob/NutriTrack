@@ -55,7 +55,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
                   product['nutriments']['proteins_100g']?.toString() ?? '0') ??
                   0,
               imageUrl: product['image_url'] ?? '',
-              sourceApi: 'Open Food Facts',
+              sourceApi: 'Open Food Facts', meal: '',
             ));
           }
 
@@ -175,9 +175,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FoodDetailPage(
-                            food: food, category: '',
-                          ),
+                          builder: (context) => FoodDetailPage(food: food, meal: ''),
                         ),
                       );
                     },
