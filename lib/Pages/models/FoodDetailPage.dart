@@ -17,6 +17,7 @@ class FoodDetailPage extends StatefulWidget {
 class _FoodDetailPageState extends State<FoodDetailPage> {
   double _quantity = 1.0;
   String _selectedMeal = "Petit-déjeuner"; // Repas par défaut
+  DateTime _selectedDate = DateTime.now(); // Date par défaut (aujourd'hui)
 
   // Méthode pour calculer les valeurs nutritionnelles ajustées
   int _calculateValue(int baseValue) {
@@ -39,7 +40,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
           'fat': _calculateValue(widget.food.fat),
           'protein': _calculateValue(widget.food.protein),
           'meal': _selectedMeal, // Le repas sélectionné
-          'date': Timestamp.now(),
+          'date': Timestamp.fromDate(_selectedDate), // Enregistrement de la date
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -61,6 +62,20 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
       );
       print("Erreur lors de l'ajout de l'aliment : $e");
     }
+  }
+
+  // Sélecteur de la date
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate)
+      setState(() {
+        _selectedDate = picked;
+      });
   }
 
   @override
@@ -92,6 +107,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 ),
               ),
               SizedBox(height: 20),
+              // Quantité de l'aliment
               Text(
                 "Quantité (en portions) :",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -115,6 +131,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 },
               ),
               SizedBox(height: 20),
+              // Sélection de repas
               Text(
                 "Sélectionnez un repas :",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -144,6 +161,26 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 ),
               ),
               SizedBox(height: 20),
+              // Sélection de la date
+              Text(
+                "Sélectionnez une date :",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${_selectedDate.toLocal()}".split(' ')[0],
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () => _selectDate(context),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              // Affichage des progress indicators
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
