@@ -65,7 +65,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
             brand: product['brands'],
             quantity: product['quantity'],
             sourceApi: "OpenFoodFacts",
-            imageUrl: product['image_url'], meal: '',
+            imageUrl: product['image_url'], meal: '', id: '',
           );
         }).toList();
       } else {
@@ -102,7 +102,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
             brand: food['brand'],
             quantity: "Quantité non spécifiée",
             sourceApi: "Edamam",
-            imageUrl: food['image'], meal: '',
+            imageUrl: food['image'], meal: '', id: '',
           );
         }).toList();
       } else {

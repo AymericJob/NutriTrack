@@ -68,6 +68,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
         List<Food> fetchedFoods = snapshot.docs.map((doc) {
           return Food(
+            id: doc.id, // On utilise l'ID du document Firestore ici
             name: doc['name'],
             calories: (doc['calories'] as num).toInt(),
             carbs: (doc['carbs'] as num).toInt(),
@@ -179,7 +180,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                       ...entry.value.map((food) {
                         return Dismissible(
-                          key: Key(food.name), // Utilise un identifiant unique
+                          key: Key(food.id), // Utilise l'ID Firestore comme clé unique
                           background: Container(
                             color: Colors.red, // Fond rouge pour signaler la suppression
                             alignment: Alignment.centerRight,
@@ -199,12 +200,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                     .collection('users')
                                     .doc(uid)
                                     .collection('foods')
-                                    .doc(food.name) // Utiliser le nom ou un ID unique
+                                    .doc(food.id) // Utiliser l'ID Firestore
                                     .delete();
 
                                 // Mettre à jour l'interface pour refléter la suppression
                                 setState(() {
-                                  _foods.remove(food);
+                                  _foods.removeWhere((item) => item.id == food.id);
                                 });
                               } catch (e) {
                                 print("Erreur lors de la suppression de l'aliment: $e");
@@ -278,19 +279,22 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildCircularProgressIndicator(
-      String label, int current, int goal, Color color) {
+      String title, int currentValue, int goalValue, Color color) {
     return Column(
       children: [
-        CircularProgressIndicator(
-          value: goal == 0 ? 0 : current / goal,
-          backgroundColor: color.withOpacity(0.2),
-          valueColor: AlwaysStoppedAnimation<Color>(color),
-        ),
-        SizedBox(height: 8),
         Text(
-          '$label: $current/${goal > 0 ? goal : 0}',
-          style: TextStyle(fontSize: 12, color: color),
+          title,
+          style: TextStyle(color: Colors.black54),
         ),
+        SizedBox(height: 5),
+        CircularProgressIndicator(
+          value: goalValue > 0 ? currentValue / goalValue : 0,
+          backgroundColor: Colors.grey[300],
+          valueColor: AlwaysStoppedAnimation<Color>(color),
+          strokeWidth: 8,
+        ),
+        SizedBox(height: 5),
+        Text('$currentValue / $goalValue'),
       ],
     );
   }
