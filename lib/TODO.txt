@@ -67,3 +67,8 @@ Prochaine étape regarder pour faire le journal au jour le jours et faire un sys
 
 Notification
 Avoir un stockage locale et quand je me reconnecte cela actualise tout dans firestore ? C'est possible ?
+
+
+
+Solution pour l'affichage:
+meal: data.containsKey('meal') ? data['meal'] as String : '', // Vérification de la clé "meal"

@@ -67,16 +67,18 @@ class _DashboardPageState extends State<DashboardPage> {
             .get();
 
         List<Food> fetchedFoods = snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>; // Assure la conversion correcte
           return Food(
             id: doc.id, // On utilise l'ID du document Firestore ici
-            name: doc['name'],
-            calories: (doc['calories'] as num).toInt(),
-            carbs: (doc['carbs'] as num).toInt(),
-            fat: (doc['fat'] as num).toInt(),
-            protein: (doc['protein'] as num).toInt(),
-            meal: doc['meal'] ?? '', // Assure-toi que "meal" existe
+            name: data['name'], // Assurez-vous que ces clés existent dans Firestore
+            calories: (data['calories'] as num).toInt(),
+            carbs: (data['carbs'] as num).toInt(),
+            fat: (data['fat'] as num).toInt(),
+            protein: (data['protein'] as num).toInt(),
+            meal: data.containsKey('meal') ? data['meal'] as String : '', // Vérification de la clé "meal"
           );
         }).toList();
+
 
         setState(() {
           _foods = fetchedFoods;
