@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import 'package:myfitnesspal/Pages/Home/Journal.dart';
 import 'package:myfitnesspal/Pages/Home/JournalPage.dart';
 import 'package:myfitnesspal/Pages/models/food.dart';
 import '../Models/add_food_page.dart';
+import '../models/FoodDetailPage.dart';
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -78,7 +78,6 @@ class _DashboardPageState extends State<DashboardPage> {
             meal: data.containsKey('meal') ? data['meal'] as String : '', // Vérification de la clé "meal"
           );
         }).toList();
-
 
         setState(() {
           _foods = fetchedFoods;
@@ -219,6 +218,15 @@ class _DashboardPageState extends State<DashboardPage> {
                             subtitle: Text(
                               'Calories: ${food.calories} | Glucides: ${food.carbs}g | Lipides: ${food.fat}g | Protéines: ${food.protein}g',
                             ),
+                            onTap: () {
+                              // Naviguer vers la page FoodDetailPage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => FoodDetailPage(food: food, meal: '',),
+                                ),
+                              );
+                            },
                           ),
                         );
                       }).toList(),
@@ -244,19 +252,6 @@ class _DashboardPageState extends State<DashboardPage> {
             },
             child: Icon(Icons.pie_chart),
             backgroundColor: Colors.green,
-          ),
-          SizedBox(height: 10),
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Journal(foods: _foods),
-                ),
-              );
-            },
-            child: Icon(Icons.book),
-            backgroundColor: Colors.orange,
           ),
           SizedBox(height: 10),
           FloatingActionButton(

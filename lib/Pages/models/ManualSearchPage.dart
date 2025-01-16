@@ -15,8 +15,9 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
   final _fatController = TextEditingController();
   final _proteinController = TextEditingController();
 
-  String? _selectedCategory; // Nouvelle variable pour la catégorie
+  String? _selectedMeal; // Repas du aliment (ex. Déjeuner, Dîner, Souper, Snack)
   bool _isLoading = false;
+  DateTime _selectedDate = DateTime.now(); // Date par défaut
 
   // Fonction pour ajouter un aliment dans Firestore
   Future<void> _addFoodToFirestore() async {
@@ -34,8 +35,8 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
         ? int.tryParse(_proteinController.text)
         : null;
 
-    // Vérification que le nom et la catégorie sont remplis
-    if (name.isEmpty || _selectedCategory == null) {
+    // Vérifier que tous les champs sont remplis correctement
+    if (name.isEmpty || _selectedMeal == null) {
       _showMessage("Veuillez remplir tous les champs obligatoires.");
       return;
     }
@@ -45,30 +46,29 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
     });
 
     try {
-      // Récupérer l'utilisateur actuellement connecté
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         _showMessage("Vous devez être connecté pour ajouter un aliment.");
         return;
       }
 
-      // Référencer la collection "users" dans Firestore
       final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-      final foodRef = userRef.collection('foods');
+      final foodRef = userRef.collection('foods').doc(); // Crée un ID unique automatiquement
 
-      // Créer un document pour l'aliment avec les informations fournies
-      await foodRef.add({
+      // Ajoute l'aliment dans la base de données avec le repas et la date
+      await foodRef.set({
         'name': name,
-        'calories': calories ?? 0, // Utilise 0 si vide
-        'carbs': carbs ?? 0, // Utilise 0 si vide
-        'fat': fat ?? 0, // Utilise 0 si vide
-        'protein': protein ?? 0, // Utilise 0 si vide
-        'category': _selectedCategory, // Ajouter la catégorie
-        'date': Timestamp.now(),  // Date actuelle d'ajout
+        'calories': calories ?? 0,
+        'carbs': carbs ?? 0,
+        'fat': fat ?? 0,
+        'protein': protein ?? 0,
+        'meal': _selectedMeal,  // Remplace "category" par "meal"
+        'date': Timestamp.fromDate(_selectedDate),
+        'id': foodRef.id,
       });
 
       _showMessage("Aliment ajouté avec succès !");
-      _clearFields(); // Réinitialiser les champs du formulaire après l'ajout
+      _clearFields();
     } catch (e) {
       _showMessage("Erreur lors de l'ajout de l'aliment : $e");
     } finally {
@@ -76,6 +76,20 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
         _isLoading = false;
       });
     }
+  }
+
+  // Sélectionner la date via un DatePicker
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate)
+      setState(() {
+        _selectedDate = picked;
+      });
   }
 
   // Réinitialiser les champs du formulaire
@@ -86,7 +100,8 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
     _fatController.clear();
     _proteinController.clear();
     setState(() {
-      _selectedCategory = null;
+      _selectedMeal = null;
+      _selectedDate = DateTime.now();
     });
   }
 
@@ -135,21 +150,40 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
               ),
               SizedBox(height: 20),
               DropdownButtonFormField<String>(
-                value: _selectedCategory,
-                decoration: InputDecoration(labelText: "Catégorie"),
+                value: _selectedMeal,  // Utilise _selectedMeal au lieu de _selectedCategory
+                decoration: InputDecoration(labelText: "Catégorie (Repas)"),
                 items: ['Déjeuner', 'Dîner', 'Souper', 'Snack']
-                    .map((category) => DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category),
+                    .map((meal) => DropdownMenuItem<String>(
+                  value: meal,
+                  child: Text(meal),
                 ))
                     .toList(),
                 onChanged: (value) {
                   setState(() {
-                    _selectedCategory = value;
+                    _selectedMeal = value;  // Met à jour _selectedMeal
                   });
                 },
                 validator: (value) =>
-                value == null ? "Veuillez choisir une catégorie" : null,
+                value == null ? "Veuillez choisir un repas" : null,
+              ),
+              SizedBox(height: 20),
+              // Sélection de la date
+              Text(
+                "Sélectionnez une date :",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${_selectedDate.toLocal()}".split(' ')[0],
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () => _selectDate(context),
+                  ),
+                ],
               ),
               SizedBox(height: 20),
               _isLoading
