@@ -1,3 +1,4 @@
+// Import necessary libraries
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -23,97 +24,59 @@ class _AddFoodPageState extends State<AddFoodPage> {
   List<Food> _foodList = [];
   bool _isLoading = false;
 
-  Future<void> _scanBarcode() async {
-    try {
-      final scanResult = await BarcodeScanner.scan();
-
-      if (scanResult.rawContent.isNotEmpty) {
-        setState(() {
-          _searchController.text = scanResult.rawContent;
-        });
-
-        // Journalisation du code-barres scanné pour débogage
-        print('Code-barres scanné: ${scanResult.rawContent}');
-
-        // Recherche du produit par code-barres
-        await _searchFoods(scanResult.rawContent);
-      } else {
-        _showMessage('Erreur de scan : Aucun code-barres trouvé.');
-      }
-    } catch (e) {
-      _showMessage('Erreur de scan : $e');
-    }
-  }
-
-  Future<void> _searchFoods(String barcode) async {
+  // Recherche des aliments par texte dans l'API Open Food Facts
+  Future<void> _searchFoods() async {
     setState(() {
       _isLoading = true;
     });
 
-    if (barcode.isNotEmpty) {
+    final query = _searchController.text.trim();
+
+    if (query.isNotEmpty) {
       try {
-        // Recherche dans Open Food Facts en utilisant le code-barres scanné
+        // Recherche dans l'API Open Food Facts par nom d'aliment
         final response = await http.get(Uri.parse(
-            'https://world.openfoodfacts.org/api/v0/product/$barcode.json'));
+            'https://world.openfoodfacts.org/cgi/search.pl?search_terms=$query&search_simple=1&json=1'));
 
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
+          final products = data['products'];
 
-          // Vérification du statut de la réponse de l'API
-          if (data['status'] == 1 && data['product'] != null) {
-            final product = data['product'];
-
-            // Création de la liste avec un seul produit trouvé
-            List<Food> foodList = [
-              Food(
-                name: product['product_name'] ?? 'Produit inconnu',
-                calories: int.tryParse(
-                    product['nutriments']['energy-kcal_100g']?.toString() ?? '0') ??
-                    0,
-                carbs: int.tryParse(
-                    product['nutriments']['carbohydrates_100g']?.toString() ?? '0') ??
-                    0,
-                fat: int.tryParse(
-                    product['nutriments']['fat_100g']?.toString() ?? '0') ??
-                    0,
-                protein: int.tryParse(
-                    product['nutriments']['proteins_100g']?.toString() ?? '0') ??
-                    0,
-                imageUrl: product['image_url'] ?? '',
-                sourceApi: 'Open Food Facts',
-                meal: '',
-                id: barcode, // Utilisation du code-barres comme ID
-              ),
-            ];
-
-            setState(() {
-              _foodList = foodList;
-              _isLoading = false;
-            });
-
-            // Si un produit a été trouvé, on redirige vers FoodDetailPage
-            if (_foodList.isNotEmpty) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FoodDetailPage(food: _foodList[0], meal: ''),
-                ),
-              );
-            }
-          } else {
-            _showMessage('Produit non trouvé.');
-            setState(() {
-              _isLoading = false;
-            });
+          List<Food> foodList = [];
+          for (var product in products) {
+            foodList.add(Food(
+              name: product['product_name'] ?? 'Inconnu',
+              calories: int.tryParse(
+                  product['nutriments']['energy-kcal_100g']?.toString() ?? '0') ??
+                  0,
+              carbs: int.tryParse(
+                  product['nutriments']['carbohydrates_100g']?.toString() ?? '0') ??
+                  0,
+              fat: int.tryParse(
+                  product['nutriments']['fat_100g']?.toString() ?? '0') ??
+                  0,
+              protein: int.tryParse(
+                  product['nutriments']['proteins_100g']?.toString() ?? '0') ??
+                  0,
+              imageUrl: product['image_url'] ?? '',
+              sourceApi: 'Open Food Facts',
+              meal: '',
+              id: '',
+            ));
           }
+
+          setState(() {
+            _foodList = foodList;
+            _isLoading = false;
+          });
         } else {
-          _showMessage('Erreur lors de la récupération des données.');
+          _showMessage(S.errorFetchingData());
           setState(() {
             _isLoading = false;
           });
         }
       } catch (e) {
-        _showMessage('Erreur de connexion : $e');
+        _showMessage(S.connectionError(e.toString()));
         setState(() {
           _isLoading = false;
         });
@@ -126,8 +89,91 @@ class _AddFoodPageState extends State<AddFoodPage> {
     }
   }
 
+  // Affichage des messages d'erreur
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  // Fonction de scan du code-barres
+  Future<void> _scanBarcode() async {
+    try {
+      final scanResult = await BarcodeScanner.scan();
+
+      if (scanResult.rawContent.isNotEmpty) {
+        setState(() {
+          _searchController.text = scanResult.rawContent;
+        });
+
+        // Fetch food details using the barcode
+        await _fetchFoodFromBarcode(scanResult.rawContent);
+      }
+    } catch (e) {
+      _showMessage(S.barcodeScanError());
+    }
+  }
+
+  // Fetch food details using the barcode
+  Future<void> _fetchFoodFromBarcode(String barcode) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await http.get(Uri.parse(
+          'https://world.openfoodfacts.org/api/v0/product/$barcode.json'));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final product = data['product'];
+
+        if (product != null) {
+          final food = Food(
+            name: product['product_name'] ?? 'Inconnu',
+            calories: int.tryParse(
+                product['nutriments']['energy-kcal_100g']?.toString() ?? '0') ??
+                0,
+            carbs: int.tryParse(
+                product['nutriments']['carbohydrates_100g']?.toString() ?? '0') ??
+                0,
+            fat: int.tryParse(
+                product['nutriments']['fat_100g']?.toString() ?? '0') ??
+                0,
+            protein: int.tryParse(
+                product['nutriments']['proteins_100g']?.toString() ?? '0') ??
+                0,
+            imageUrl: product['image_url'] ?? '',
+            sourceApi: 'Open Food Facts',
+            meal: '',
+            id: barcode,
+          );
+
+          setState(() {
+            _isLoading = false;
+          });
+
+          // Navigate to the FoodDetailPage with the scanned food data
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FoodDetailPage(
+                food: food,
+                meal: '',
+              ),
+            ),
+          );
+        }
+      } else {
+        _showMessage(S.errorFetchingData());
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      _showMessage(S.connectionError(e.toString()));
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -141,22 +187,24 @@ class _AddFoodPageState extends State<AddFoodPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Champ de recherche
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: S.searchFoodHint(), // Traduction du texte d'indice "Search for food"
+                hintText: S.searchFoodHint(), // Texte d'indice pour la recherche
                 suffixIcon: IconButton(
                   icon: Icon(Icons.search),
-                  onPressed: () => _searchFoods(_searchController.text.trim()),
+                  onPressed: _searchFoods, // Déclenche la recherche
                 ),
               ),
             ),
             SizedBox(height: 20),
+            // Boutons Scan et Recherche Manuelle
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton.icon(
-                  onPressed: _scanBarcode,
+                  onPressed: _scanBarcode,  // Scanner le code-barres
                   icon: Icon(Icons.qr_code_scanner),
                   label: Text(S.scanButtonLabel()), // Traduction du bouton "Scan"
                   style: ElevatedButton.styleFrom(
@@ -181,6 +229,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
               ],
             ),
             SizedBox(height: 20),
+            // Affichage de l'indicateur de chargement ou des résultats
             _isLoading
                 ? Center(child: CircularProgressIndicator())
                 : Expanded(
