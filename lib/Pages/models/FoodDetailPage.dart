@@ -6,11 +6,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../l10n/intl_en.dart';
 import '../models/food.dart';
 
-
 class FoodDetailPage extends StatefulWidget {
   final Food food;
 
-  const FoodDetailPage({Key? key, required this.food, required String meal}) : super(key: key);
+  const FoodDetailPage({Key? key, required this.food, required String meal})
+      : super(key: key);
 
   @override
   _FoodDetailPageState createState() => _FoodDetailPageState();
@@ -26,24 +26,45 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
     return (baseValue * _quantity).round();
   }
 
-  // Méthode pour ajouter l'aliment avec le repas sélectionné
-  Future<void> _addFood() async {
+  // Méthode pour ajouter ou mettre à jour l'aliment
+  Future<void> _saveFood() async {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid != null) {
-        await FirebaseFirestore.instance
+        // Référence au document utilisateur
+        final userFoodsRef = FirebaseFirestore.instance
             .collection('users')
             .doc(uid)
-            .collection('foods')
-            .add({
-          'name': widget.food.name,
-          'calories': _calculateValue(widget.food.calories),
-          'carbs': _calculateValue(widget.food.carbs),
-          'fat': _calculateValue(widget.food.fat),
-          'protein': _calculateValue(widget.food.protein),
-          'meal': _selectedMeal, // Le repas sélectionné
-          'date': Timestamp.fromDate(_selectedDate), // Enregistrement de la date
-        });
+            .collection('foods');
+
+        // Vérifie si un aliment existe déjà pour la date et le repas
+        final query = await userFoodsRef
+            .where('name', isEqualTo: widget.food.name)
+            .where('date', isEqualTo: Timestamp.fromDate(_selectedDate))
+            .where('meal', isEqualTo: _selectedMeal)
+            .get();
+
+        if (query.docs.isNotEmpty) {
+          // Si un aliment existe, on le met à jour
+          final docId = query.docs.first.id;
+          await userFoodsRef.doc(docId).update({
+            'calories': FieldValue.increment(_calculateValue(widget.food.calories)),
+            'carbs': FieldValue.increment(_calculateValue(widget.food.carbs)),
+            'fat': FieldValue.increment(_calculateValue(widget.food.fat)),
+            'protein': FieldValue.increment(_calculateValue(widget.food.protein)),
+          });
+        } else {
+          // Sinon, on ajoute un nouvel aliment
+          await userFoodsRef.add({
+            'name': widget.food.name,
+            'calories': _calculateValue(widget.food.calories),
+            'carbs': _calculateValue(widget.food.carbs),
+            'fat': _calculateValue(widget.food.fat),
+            'protein': _calculateValue(widget.food.protein),
+            'meal': _selectedMeal,
+            'date': Timestamp.fromDate(_selectedDate),
+          });
+        }
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(S.foodAddedSuccessfully())),
@@ -62,7 +83,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.errorAddingFood())),
       );
-      print("Erreur lors de l'ajout de l'aliment : $e");
+      print("Erreur lors de la sauvegarde de l'aliment : $e");
     }
   }
 
@@ -74,10 +95,11 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate)
+    if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
       });
+    }
   }
 
   @override
@@ -101,7 +123,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                S.foodDetailTitle(), // Traduction du titre "Food Details"
+                S.foodDetailTitle(),
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -111,7 +133,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
               SizedBox(height: 20),
               // Quantité de l'aliment
               Text(
-                S.quantityLabel(), // Traduction de "Quantity (in servings)"
+                S.quantityLabel(),
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               TextField(
@@ -135,7 +157,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
               SizedBox(height: 20),
               // Sélection de repas
               Text(
-                S.mealSelectionLabel(), // Traduction de "Select a meal"
+                S.mealSelectionLabel(),
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               DropdownButton<String>(
@@ -146,7 +168,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   });
                 },
                 items: <String>[
-                  "breakfast",
+                  "Breakfast",
                   "Lunch",
                   "Diner",
                   "Snack"
@@ -165,14 +187,14 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
               SizedBox(height: 20),
               // Sélection de la date
               Text(
-                S.dateSelectionLabel(), // Traduction de "Select a date"
+                S.dateSelectionLabel(),
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    S.dateLabel(_selectedDate), // Traduction de la date sélectionnée
+                    S.dateLabel(_selectedDate),
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -182,20 +204,20 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 ],
               ),
               SizedBox(height: 20),
-              // Affichage des progress indicators
+              // Progress indicators pour les nutriments
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildProgressIndicator(
-                    S.caloriesLabel(), // Traduction de "Calories"
+                    S.caloriesLabel(),
                     _calculateValue(widget.food.calories),
-                    2000, // AJR (Apports Journaliers Recommandés)
+                    2000,
                     Colors.orange,
                   ),
                   _buildProgressIndicator(
-                    S.carbsLabel(), // Traduction de "Carbs"
+                    S.carbsLabel(),
                     _calculateValue(widget.food.carbs),
-                    300, // AJR pour glucides
+                    300,
                     Colors.blue,
                   ),
                 ],
@@ -205,15 +227,15 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildProgressIndicator(
-                    S.fatsLabel(), // Traduction de "Fats"
+                    S.fatsLabel(),
                     _calculateValue(widget.food.fat),
-                    70, // AJR pour graisses
+                    70,
                     Colors.red,
                   ),
                   _buildProgressIndicator(
-                    S.proteinLabel(), // Traduction de "Proteins"
+                    S.proteinLabel(),
                     _calculateValue(widget.food.protein),
-                    50, // AJR pour protéines
+                    50,
                     Colors.green,
                   ),
                 ],
@@ -221,7 +243,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
               SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
-                  onPressed: _addFood,
+                  onPressed: _saveFood,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blueAccent,
@@ -231,7 +253,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                     padding:
                     EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                   ),
-                  child: Text(S.addFoodButtonLabel(), // Traduction du bouton
+                  child: Text(S.addFoodButtonLabel(),
                       style: TextStyle(fontSize: 18)),
                 ),
               ),
