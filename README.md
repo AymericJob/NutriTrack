@@ -67,7 +67,8 @@ Il existe de nombreuses applications de suivi de l'alimentation sur le marché, 
 
 ## 👀 Design de l'application
 
-TODO
+![13](https://github.com/user-attachments/assets/4c4ab01f-b174-4289-886f-490e442c952a)
+
 
 ## ⚙️ Fonctionnalités de l'application
 
