@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../l10n/intl_en.dart';
 import 'NotificationsPage.dart';
 import 'dashboard_page.dart';
 import 'activity_page.dart';
@@ -17,6 +19,24 @@ class _MainPageState extends State<MainPage> {
     ActivityPage(),
     ProfilePage(),
   ];
+
+  Future<int> _getCurrentStepCount() async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      try {
+        DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
+            .collection('step_counts')
+            .doc(uid)
+            .get();
+        if (docSnapshot.exists) {
+          return docSnapshot['steps'] ?? 0;
+        }
+      } catch (e) {
+        print("Error fetching step count: $e");
+      }
+    }
+    return 0;
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -37,15 +57,15 @@ class _MainPageState extends State<MainPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Log out', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: Text('Are you sure you want to log out?'),
+          title: Text(S.logOutTitle(), style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Text(S.logOutMessage()),
           actions: [
             TextButton(
-              child: Text('Cancel', style: TextStyle(color: Colors.blue)),
+              child: Text(S.cancel(), style: TextStyle(color: Colors.blue)),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             TextButton(
-              child: Text('Log out', style: TextStyle(color: Colors.red)),
+              child: Text(S.logOut(), style: TextStyle(color: Colors.red)),
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
@@ -58,7 +78,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('NutriTrack'),
+        title: Text(S.appTitle()),
         backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
@@ -66,7 +86,7 @@ class _MainPageState extends State<MainPage> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => NotificationsPage(), // Redirige vers NotificationsPage
+                  builder: (context) => NotificationsPage(),
                 ),
               );
             },
@@ -91,31 +111,51 @@ class _MainPageState extends State<MainPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('NutriTrack', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                Text(S.appTitle(), style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
-                Text('Welcome, ${FirebaseAuth.instance.currentUser?.email ?? 'User'}',
+                Text(S.welcomeMessage(FirebaseAuth.instance.currentUser?.email ?? 'User'),
                     style: TextStyle(color: Colors.white70, fontSize: 16)),
               ],
             ),
           ),
           ListTile(
             leading: Icon(Icons.settings),
-            title: Text('Settings'),
+            title: Text(S.settings()),
             onTap: () {
-              Navigator.of(context).pushNamed('/settings'); // Assurez-vous que cette route est définie
+              Navigator.of(context).pushNamed('/settings');
             },
           ),
           ListTile(
             leading: Icon(Icons.info),
-            title: Text('More about us'),
+            title: Text(S.moreAboutUs()),
             onTap: () {
               // Action pour ouvrir la page À propos
             },
           ),
           ListTile(
             leading: Icon(Icons.exit_to_app),
-            title: Text('Log out'),
+            title: Text(S.logOutDrawer()),
             onTap: () => _signOut(context),
+          ),
+          FutureBuilder<int>(
+            future: _getCurrentStepCount(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return ListTile(
+                  title: Text(S.loadingStepCount()),
+                );
+              }
+              if (snapshot.hasError) {
+                return ListTile(
+                  title: Text(S.errorStepCount()),
+                );
+              }
+              int stepCount = snapshot.data ?? 0;
+              return ListTile(
+                leading: Icon(Icons.directions_walk),
+                title: Text('${S.currentStepCount()}$stepCount'),
+              );
+            },
           ),
         ],
       ),
@@ -130,7 +170,7 @@ class _MainPageState extends State<MainPage> {
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.white54,
       items: [
-        BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+        BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: S.Dashboard()),
         BottomNavigationBarItem(
           icon: Stack(
             children: [
@@ -143,9 +183,9 @@ class _MainPageState extends State<MainPage> {
               ),
             ],
           ),
-          label: 'Activity',
+          label: S.Activity(),
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: S.Profile()),
       ],
     );
   }

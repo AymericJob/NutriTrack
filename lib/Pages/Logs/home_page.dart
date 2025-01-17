@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myfitnesspal/Routes/app_routes.dart';
+import '../../l10n/intl_en.dart';
+
 
 class HomePage extends StatelessWidget {
   @override
@@ -20,7 +22,7 @@ class HomePage extends StatelessWidget {
             children: [
               SizedBox(height: 40),
               Text(
-                "Bienvenue dans l'App",
+                S.welcomeMessage2(), // Traduction du message de bienvenue
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -41,7 +43,7 @@ class HomePage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                 ),
                 child: Text(
-                  'Login',
+                  S.loginButton(), // Traduction du bouton "Login"
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -59,7 +61,7 @@ class HomePage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                 ),
                 child: Text(
-                  'Register',
+                  S.registerButton(), // Traduction du bouton "Register"
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),

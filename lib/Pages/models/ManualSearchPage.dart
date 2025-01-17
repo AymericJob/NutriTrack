@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../../l10n/intl_en.dart';
 
 class ManualSearchPage extends StatefulWidget {
   @override
@@ -37,7 +38,7 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
 
     // Vérifier que tous les champs sont remplis correctement
     if (name.isEmpty || _selectedMeal == null) {
-      _showMessage("Veuillez remplir tous les champs obligatoires.");
+      _showMessage(S.invalidField()); // Utilisation de la traduction
       return;
     }
 
@@ -48,7 +49,7 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        _showMessage("Vous devez être connecté pour ajouter un aliment.");
+        _showMessage(S.userNotAuthenticated()); // Utilisation de la traduction
         return;
       }
 
@@ -67,10 +68,10 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
         'id': foodRef.id,
       });
 
-      _showMessage("Aliment ajouté avec succès !");
+      _showMessage(S.foodAddedSuccessfully()); // Utilisation de la traduction
       _clearFields();
     } catch (e) {
-      _showMessage("Erreur lors de l'ajout de l'aliment : $e");
+      _showMessage("${S.errorAddingFood()} $e"); // Utilisation de la traduction
     } finally {
       setState(() {
         _isLoading = false;
@@ -114,7 +115,7 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ajouter un aliment manuellement"),
+        title: Text(S.manualSearchTitle()), // Traduction du titre
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
@@ -125,34 +126,34 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: "Nom de l'aliment"),
-                validator: (value) => value!.isEmpty ? "Ce champ est obligatoire" : null,
+                decoration: InputDecoration(labelText: S.foodNameLabel()), // Traduction du label
+                validator: (value) => value!.isEmpty ? S.invalidField() : null, // Traduction du message d'erreur
               ),
               TextFormField(
                 controller: _caloriesController,
-                decoration: InputDecoration(labelText: "Calories (par portion)"),
+                decoration: InputDecoration(labelText: S.caloriesLabel()), // Traduction du label
                 keyboardType: TextInputType.number,
               ),
               TextFormField(
                 controller: _carbsController,
-                decoration: InputDecoration(labelText: "Glucides (g)"),
+                decoration: InputDecoration(labelText: S.carbsLabel()), // Traduction du label
                 keyboardType: TextInputType.number,
               ),
               TextFormField(
                 controller: _fatController,
-                decoration: InputDecoration(labelText: "Graisses (g)"),
+                decoration: InputDecoration(labelText: S.fatLabel()), // Traduction du label
                 keyboardType: TextInputType.number,
               ),
               TextFormField(
                 controller: _proteinController,
-                decoration: InputDecoration(labelText: "Protéines (g)"),
+                decoration: InputDecoration(labelText: S.proteinLabel()), // Traduction du label
                 keyboardType: TextInputType.number,
               ),
               SizedBox(height: 20),
               DropdownButtonFormField<String>(
-                value: _selectedMeal,  // Utilise _selectedMeal au lieu de _selectedCategory
-                decoration: InputDecoration(labelText: "Catégorie (Repas)"),
-                items: ['Déjeuner', 'Dîner', 'Souper', 'Snack']
+                value: _selectedMeal,
+                decoration: InputDecoration(labelText: S.mealLabel()), // Traduction du label
+                items: ['Breakfest', 'Lunch', 'Diner', 'Snack']
                     .map((meal) => DropdownMenuItem<String>(
                   value: meal,
                   child: Text(meal),
@@ -160,16 +161,16 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
                     .toList(),
                 onChanged: (value) {
                   setState(() {
-                    _selectedMeal = value;  // Met à jour _selectedMeal
+                    _selectedMeal = value;
                   });
                 },
                 validator: (value) =>
-                value == null ? "Veuillez choisir un repas" : null,
+                value == null ? S.invalidField() : null, // Traduction du message d'erreur
               ),
               SizedBox(height: 20),
               // Sélection de la date
               Text(
-                "Sélectionnez une date :",
+                S.dateSelectionLabel(), // Traduction de "Sélectionnez une date"
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               Row(
@@ -194,7 +195,7 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
                     _addFoodToFirestore();
                   }
                 },
-                child: Text("Ajouter l'aliment"),
+                child: Text(S.addFoodButtonLabel()), // Traduction du bouton
               ),
             ],
           ),

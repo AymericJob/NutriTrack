@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../l10n/intl_en.dart';
 
 class PersonalInfoPage extends StatefulWidget {
   @override
@@ -69,13 +70,13 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
           );
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Informations updated successfully!')),
+            SnackBar(content: Text(S.infoUpdatedSuccess())),
           );
         }
       } catch (e) {
         print('Error saving user info: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update information.')),
+          SnackBar(content: Text(S.infoUpdateError())),
         );
       }
     }
@@ -85,7 +86,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Personal Information'),
+        title: Text(S.personalInfoTitle()),
         backgroundColor: Colors.blueAccent,
       ),
       body: _isLoading
@@ -101,12 +102,12 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Name',
+                  labelText: S.name(),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
+                    return S.nameRequired();
                   }
                   return null;
                 },
@@ -115,12 +116,12 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
-                  labelText: 'Email',
+                  labelText: S.email(),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
+                    return S.emailRequired();
                   }
                   return null;
                 },
@@ -128,7 +129,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: _saveUserInfo,
-                child: Text('Save'),
+                child: Text(S.save()),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   padding: EdgeInsets.symmetric(vertical: 15),
@@ -150,7 +151,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Your Personal Information',
+          S.viewAndUpdateDetails(),
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -159,7 +160,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
         ),
         SizedBox(height: 10),
         Text(
-          'View and update your personal details.',
+          S.viewAndUpdateDetails(),
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey.shade700,

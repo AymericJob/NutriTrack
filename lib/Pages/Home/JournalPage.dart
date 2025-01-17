@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
+import '../../l10n/intl_en.dart';
 import '../models/food.dart';
+
 
 class JournalPage extends StatelessWidget {
   final List<Food> foods;
@@ -18,15 +19,15 @@ class JournalPage extends StatelessWidget {
 
     // Créer les données du graphique
     List<NutrientData> chartData = [
-      NutrientData('Calories', totalCalories),
-      NutrientData('Glucides', totalCarbs),
-      NutrientData('Protéines', totalProtein),
-      NutrientData('Lipides', totalFat),
+      NutrientData(S.calories(), totalCalories),
+      NutrientData(S.carbs(), totalCarbs),
+      NutrientData(S.protein(), totalProtein),
+      NutrientData(S.fat(), totalFat),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Journal de Nutrition'),
+        title: Text(S.journalTitle()), // Traduction du titre
         backgroundColor: Colors.blue,
       ),
       body: Padding(
@@ -36,7 +37,7 @@ class JournalPage extends StatelessWidget {
           children: [
             // Titre du graphique
             Text(
-              'Répartition Nutritionnelle',
+              S.nutrientDistribution(),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
@@ -78,7 +79,7 @@ class JournalPage extends StatelessWidget {
 
             // Résumé des macronutriments sous le graphique
             Text(
-              'Résumé des Macros',
+              S.summaryOfMacros(),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
@@ -94,10 +95,10 @@ class JournalPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildMacroRow('Calories', totalCalories, 'kcal'),
-                    _buildMacroRow('Glucides', totalCarbs, 'g'),
-                    _buildMacroRow('Protéines', totalProtein, 'g'),
-                    _buildMacroRow('Lipides', totalFat, 'g'),
+                    _buildMacroRow(S.calories(), totalCalories, S.kcal()),
+                    _buildMacroRow(S.carbs(), totalCarbs, S.grams()),
+                    _buildMacroRow(S.protein(), totalProtein, S.grams()),
+                    _buildMacroRow(S.fat(), totalFat, S.grams()),
                   ],
                 ),
               ),

@@ -5,8 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:myfitnesspal/Pages/Models/ManualSearchPage.dart';
+import '../../l10n/intl_en.dart';
 import '../models/food.dart';
 import 'FoodDetailPage.dart';
+
 
 class AddFoodPage extends StatefulWidget {
   final void Function(Food food) onFoodAdded;
@@ -41,7 +43,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
           List<Food> foodList = [];
           for (var product in products) {
             foodList.add(Food(
-              name: product['product_name'] ?? 'Inconnu',
+              name: product['product_name'] ?? 'Unknown',
               calories: int.tryParse(
                   product['nutriments']['energy-kcal_100g']?.toString() ?? '0') ??
                   0,
@@ -66,13 +68,13 @@ class _AddFoodPageState extends State<AddFoodPage> {
             _isLoading = false;
           });
         } else {
-          _showMessage("Erreur lors de la récupération des données.");
+          _showMessage(S.errorFetchingData());
           setState(() {
             _isLoading = false;
           });
         }
       } catch (e) {
-        _showMessage("Erreur de connexion : $e");
+        _showMessage(S.connectionError(e.toString()));
         setState(() {
           _isLoading = false;
         });
@@ -100,7 +102,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
         await _searchFoods();
       }
     } catch (e) {
-      _showMessage("Erreur lors du scan du code-barres.");
+      _showMessage(S.barcodeScanError());
     }
   }
 
@@ -108,7 +110,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ajouter un aliment"),
+        title: Text(S.addFoodLabel()), // Traduction du titre "Add Food"
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
@@ -118,7 +120,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: "Recherchez un aliment",
+                hintText: S.searchFoodHint(), // Traduction du texte d'indice "Search for food"
                 suffixIcon: IconButton(
                   icon: Icon(Icons.search),
                   onPressed: _searchFoods,
@@ -132,7 +134,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
                 ElevatedButton.icon(
                   onPressed: _scanBarcode,
                   icon: Icon(Icons.qr_code_scanner),
-                  label: Text("Scanner"),
+                  label: Text(S.scanButtonLabel()), // Traduction du bouton "Scan"
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
@@ -146,7 +148,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
                     );
                   },
                   icon: Icon(Icons.add),
-                  label: Text("Manuel"),
+                  label: Text(S.manualButtonLabel()), // Traduction du bouton "Manual"
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,

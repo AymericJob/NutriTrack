@@ -8,6 +8,8 @@ import '../Pages/Logs/home_page.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'Routes/app_routes.dart';  // Import des routes définies
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 
 // Déclarez une clé de navigation globale pour pouvoir utiliser context n'importe où
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -109,7 +111,17 @@ class MyApp extends StatelessWidget {
           return Center(child: CircularProgressIndicator());
         },
       ),
-      onGenerateRoute: AppRoutes.generateRoute,  // Ajouter la gestion des routes
+      onGenerateRoute: AppRoutes.generateRoute, // Ajouter la gestion des routes
+      supportedLocales: [
+        Locale('en', 'US'),  // Anglais
+        Locale('fr', 'FR'),  // Français
+      ],
+      locale: Locale('en', 'US'),  // Langue par défaut (Anglais)
+      localizationsDelegates: [
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+      ],
     );
   }
 }

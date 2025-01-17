@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../l10n/intl_en.dart';
+
+
 class ActivityTrackingPage extends StatelessWidget {
   final TextEditingController _goalController = TextEditingController();
 
@@ -15,13 +18,13 @@ class ActivityTrackingPage extends StatelessWidget {
             .doc(uid)
             .set({'goal': stepGoal});
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Goal saved successfully!')),
+          SnackBar(content: Text(S.goalSavedSuccess())),
         );
         Navigator.pop(context); // Return to the previous page
       } catch (e) {
         print("Error saving the goal: $e");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving the goal.')),
+          SnackBar(content: Text(S.goalSaveError())),
         );
       }
     }
@@ -31,7 +34,7 @@ class ActivityTrackingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Goal', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(S.yourGoalTitle(), style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blueAccent,
         elevation: 0, // Supprimer l'ombre de l'appbar pour une apparence plus clean
       ),
@@ -41,7 +44,7 @@ class ActivityTrackingPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Set your daily step goal',
+              S.setStepGoal(),
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
@@ -50,7 +53,7 @@ class ActivityTrackingPage extends StatelessWidget {
             ),
             SizedBox(height: 30),
             Text(
-              'Enter your goal in steps:',
+              S.enterGoal(),
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[700],
@@ -62,9 +65,9 @@ class ActivityTrackingPage extends StatelessWidget {
               keyboardType: TextInputType.number,
               style: TextStyle(fontSize: 18),
               decoration: InputDecoration(
-                labelText: 'Step Goal',
+                labelText: S.stepGoalHint(),
                 labelStyle: TextStyle(color: Colors.blueAccent),
-                hintText: 'E.g. 10000 steps',
+                hintText: S.stepGoalHint(),
                 hintStyle: TextStyle(color: Colors.grey),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -91,7 +94,7 @@ class ActivityTrackingPage extends StatelessWidget {
                 ),
                 onPressed: () => _saveStepGoal(context),
                 child: Text(
-                  'Save Goal',
+                  S.saveGoal(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ),

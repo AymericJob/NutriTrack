@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../l10n/intl_en.dart';
 import '../models/food.dart';
 import 'FoodDetailPage.dart';
+
 class FoodSearchPage extends StatefulWidget {
   @override
   _FoodSearchPageState createState() => _FoodSearchPageState();
@@ -37,7 +39,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
       });
     } catch (e) {
       print("Erreur lors de la recherche : $e");  // Affichage de l'erreur dans la console
-      _showMessage("Erreur de recherche : $e");
+      _showMessage(S.errorSearchMessage(e.toString())); // Utilisation de la traduction
     } finally {
       setState(() {
         _isLoading = false;
@@ -124,7 +126,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Recherche combinée d'aliments"),
+        title: Text(S.foodSearchPageTitle()), // Utilisation de la traduction pour le titre
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
@@ -136,7 +138,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
               controller: _searchController,
               onSubmitted: (_) => _searchFoods(),  // Lancer la recherche à la soumission
               decoration: InputDecoration(
-                hintText: "Recherchez un aliment",
+                hintText: S.searchHintText(), // Utilisation de la traduction pour l'indice de recherche
                 suffixIcon: IconButton(
                   icon: Icon(Icons.search),
                   onPressed: _searchFoods,  // Recherche manuelle via le bouton
@@ -163,7 +165,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
                         height: 50,
                         fit: BoxFit.cover,
                       )
-                          : Icon(Icons.fastfood, size: 50),
+                          : Icon(Icons.fastfood, size: 50),  // Icône par défaut si pas d'image
                       title: Text(
                         food.name,
                         style: TextStyle(fontWeight: FontWeight.bold),

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../l10n/intl_en.dart';
+
 
 class NutritionGoalsPage extends StatelessWidget {
   final TextEditingController _caloriesController = TextEditingController();
@@ -12,7 +14,7 @@ class NutritionGoalsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nutrition Goals'),
+        title: Text(S.nutritionGoalsTitle()),
         backgroundColor: Colors.blue.shade700,
         elevation: 4,
       ),
@@ -25,8 +27,8 @@ class NutritionGoalsPage extends StatelessWidget {
               _buildHeader(),
               SizedBox(height: 30),
               _buildGoalSection(
-                title: 'Total Calories',
-                hintText: 'Enter daily calories',
+                title: S.totalCalories(),
+                hintText: S.enterDailyCalories(),
                 controller: _caloriesController,
                 unit: 'kcal',
                 icon: Icons.local_fire_department_outlined,
@@ -34,8 +36,8 @@ class NutritionGoalsPage extends StatelessWidget {
               ),
               SizedBox(height: 20),
               _buildGoalSection(
-                title: 'Protein',
-                hintText: 'Enter daily protein',
+                title: S.protein(),
+                hintText: S.enterDailyProtein(),
                 controller: _proteinController,
                 unit: 'g',
                 icon: Icons.fitness_center_outlined,
@@ -43,8 +45,8 @@ class NutritionGoalsPage extends StatelessWidget {
               ),
               SizedBox(height: 20),
               _buildGoalSection(
-                title: 'Carbohydrates',
-                hintText: 'Enter daily carbs',
+                title: S.carbs(),
+                hintText: S.enterDailyCarbs(),
                 controller: _carbsController,
                 unit: 'g',
                 icon: Icons.grain_outlined,
@@ -52,8 +54,8 @@ class NutritionGoalsPage extends StatelessWidget {
               ),
               SizedBox(height: 20),
               _buildGoalSection(
-                title: 'Fat',
-                hintText: 'Enter daily fat',
+                title: S.fat(),
+                hintText: S.enterDailyFat(),
                 controller: _fatController,
                 unit: 'g',
                 icon: Icons.lunch_dining_outlined,
@@ -73,7 +75,7 @@ class NutritionGoalsPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Set Your Daily Nutrition Goals',
+          S.setDailyNutritionGoals(),
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
@@ -82,7 +84,7 @@ class NutritionGoalsPage extends StatelessWidget {
         ),
         SizedBox(height: 8),
         Text(
-          'Track your calorie, protein, carbohydrate, and fat intake to stay on top of your nutrition.',
+          S.trackNutritionDescription(),
           style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
         ),
       ],
@@ -163,7 +165,7 @@ class NutritionGoalsPage extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: () => _saveNutritionGoals(context),
         icon: Icon(Icons.save_outlined),
-        label: Text('Save Goals'),
+        label: Text(S.saveGoals()),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue.shade700,
           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
@@ -186,7 +188,7 @@ class NutritionGoalsPage extends StatelessWidget {
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please sign in to save your goals')),
+          SnackBar(content: Text(S.signInPrompt())),
         );
         return;
       }
@@ -200,7 +202,7 @@ class NutritionGoalsPage extends StatelessWidget {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Nutrition goals saved!'),
+          content: Text(S.goalsSavedSuccess()),
           backgroundColor: Colors.green.shade600,
         ),
       );
@@ -208,7 +210,7 @@ class NutritionGoalsPage extends StatelessWidget {
       print('Error saving goals: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to save goals'),
+          content: Text(S.goalsSaveError()),
           backgroundColor: Colors.red.shade600,
         ),
       );

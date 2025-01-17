@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../l10n/intl_en.dart';
+
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -17,17 +19,17 @@ class _SettingsPageState extends State<SettingsPage> {
     String? newPassword = await _showPasswordDialog(context);
     if (newPassword != null && newPassword.isNotEmpty) {
       if (newPassword.length < 6) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password must be at least 6 characters long')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.passwordError())));
         return;
       }
       try {
         User? user = FirebaseAuth.instance.currentUser;
         await user?.updatePassword(newPassword);
         print("Password changed");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password updated successfully')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.passwordUpdated())));
       } catch (e) {
         print("Error changing password: $e");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating password')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.errorUpdatingPassword())));
       }
     }
   }
@@ -37,20 +39,20 @@ class _SettingsPageState extends State<SettingsPage> {
     String? newEmail = await _showEmailDialog(context);
     if (newEmail != null && newEmail.isNotEmpty) {
       if (!_isValidEmail(newEmail)) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter a valid email address')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.emailError())));
         return;
       }
       try {
         User? user = FirebaseAuth.instance.currentUser;
         await user?.updateEmail(newEmail);
         print("Email changed to $newEmail");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Email updated successfully')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.emailUpdated())));
         // Déconnecter l'utilisateur après avoir changé l'email
         await FirebaseAuth.instance.signOut();
         Navigator.of(context).pushReplacementNamed('/login');
       } catch (e) {
         print("Error changing email: $e");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating email')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.errorUpdatingEmail())));
       }
     }
   }
@@ -75,7 +77,7 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Enter new email'),
+          title: Text(S.enterNewEmail()),
           content: TextField(
             controller: _emailController,
             decoration: InputDecoration(hintText: 'New Email'),
@@ -83,13 +85,13 @@ class _SettingsPageState extends State<SettingsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: Text(S.cancel()),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context, _emailController.text);
               },
-              child: Text('Submit'),
+              child: Text(S.submit()),
             ),
           ],
         );
@@ -103,7 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Enter new password'),
+          title: Text(S.enterNewPassword()),
           content: TextField(
             controller: _passwordController,
             obscureText: true,
@@ -112,13 +114,13 @@ class _SettingsPageState extends State<SettingsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: Text(S.cancel()),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context, _passwordController.text);
               },
-              child: Text('Submit'),
+              child: Text(S.submit()),
             ),
           ],
         );
@@ -130,7 +132,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text(S.settingsTitle()), // Traduction du titre
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
@@ -138,19 +140,19 @@ class _SettingsPageState extends State<SettingsPage> {
         child: ListView(
           children: [
             ListTile(
-              title: Text('Change Email', style: TextStyle(fontSize: 18)),
+              title: Text(S.changeEmail(), style: TextStyle(fontSize: 18)),
               leading: FaIcon(FontAwesomeIcons.envelope, color: Colors.blueAccent), // Icon Font Awesome
               onTap: () => _changeEmail(context),
             ),
             Divider(),
             ListTile(
-              title: Text('Change Password', style: TextStyle(fontSize: 18)),
+              title: Text(S.changePassword(), style: TextStyle(fontSize: 18)),
               leading: FaIcon(FontAwesomeIcons.key, color: Colors.blueAccent), // Icon Font Awesome
               onTap: () => _changePassword(context),
             ),
             Divider(),
             SwitchListTile(
-              title: Text('Enable Notifications', style: TextStyle(fontSize: 18)),
+              title: Text(S.enableNotifications(), style: TextStyle(fontSize: 18)),
               value: _isNotificationsEnabled,
               onChanged: _toggleNotifications,
               secondary: FaIcon(FontAwesomeIcons.bell, color: Colors.blueAccent), // Icon Font Awesome

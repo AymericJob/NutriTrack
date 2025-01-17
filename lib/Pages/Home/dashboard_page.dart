@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:myfitnesspal/Pages/Home/JournalPage.dart';
 import 'package:myfitnesspal/Pages/models/food.dart';
+import '../../l10n/intl_en.dart';
 import '../Models/add_food_page.dart';
 import '../models/FoodDetailPage.dart';
 
@@ -67,15 +68,15 @@ class _DashboardPageState extends State<DashboardPage> {
             .get();
 
         List<Food> fetchedFoods = snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>; // Assure la conversion correcte
+          final data = doc.data() as Map<String, dynamic>;
           return Food(
-            id: doc.id, // On utilise l'ID du document Firestore ici
-            name: data['name'], // Assurez-vous que ces clés existent dans Firestore
+            id: doc.id,
+            name: data['name'],
             calories: (data['calories'] as num).toInt(),
             carbs: (data['carbs'] as num).toInt(),
             fat: (data['fat'] as num).toInt(),
             protein: (data['protein'] as num).toInt(),
-            meal: data.containsKey('meal') ? data['meal'] as String : '', // Vérification de la clé "meal"
+            meal: data.containsKey('meal') ? data['meal'] as String : '',
           );
         }).toList();
 
@@ -149,20 +150,20 @@ class _DashboardPageState extends State<DashboardPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildCircularProgressIndicator(
-                    'Calories', totalCalories, _calorieGoal, Colors.red),
+                    S.calories(), totalCalories, _calorieGoal, Colors.red),
                 _buildCircularProgressIndicator(
-                    'Carbs', totalCarbs, _carbsGoal, Colors.blue),
+                    S.carbs(), totalCarbs, _carbsGoal, Colors.blue),
                 _buildCircularProgressIndicator(
-                    'Protein', totalProtein, _proteinGoal, Colors.green),
+                    S.protein(), totalProtein, _proteinGoal, Colors.green),
                 _buildCircularProgressIndicator(
-                    'Fat', totalFat, _fatGoal, Colors.orange),
+                    S.fat(), totalFat, _fatGoal, Colors.orange),
               ],
             ),
             SizedBox(height: 20),
 
             // Aliments consommés par catégories
             Text(
-              'Aliments consommés',
+              S.consumedFoods(),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Expanded(
@@ -172,7 +173,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        entry.key, // Nom du repas (ex. : Petit-déjeuner)
+                        entry.key,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -181,30 +182,27 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                       ...entry.value.map((food) {
                         return Dismissible(
-                          key: Key(food.id), // Utilise l'ID Firestore comme clé unique
+                          key: Key(food.id),
                           background: Container(
-                            color: Colors.red, // Fond rouge pour signaler la suppression
+                            color: Colors.red,
                             alignment: Alignment.centerRight,
                             child: Padding(
                               padding: const EdgeInsets.only(right: 20.0),
                               child: Icon(Icons.delete, color: Colors.white),
                             ),
                           ),
-                          direction: DismissDirection.endToStart, // Glisse pour supprimer
+                          direction: DismissDirection.endToStart,
                           onDismissed: (direction) async {
-                            // Supprimer l'aliment de Firestore
                             String? uid = FirebaseAuth.instance.currentUser?.uid;
                             if (uid != null) {
                               try {
-                                // Supprimer le document correspondant à cet aliment
                                 await FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(uid)
                                     .collection('foods')
-                                    .doc(food.id) // Utiliser l'ID Firestore
+                                    .doc(food.id)
                                     .delete();
 
-                                // Mettre à jour l'interface pour refléter la suppression
                                 setState(() {
                                   _foods.removeWhere((item) => item.id == food.id);
                                 });
@@ -216,14 +214,13 @@ class _DashboardPageState extends State<DashboardPage> {
                           child: ListTile(
                             title: Text(food.name),
                             subtitle: Text(
-                              'Calories: ${food.calories} | Glucides: ${food.carbs}g | Lipides: ${food.fat}g | Protéines: ${food.protein}g',
+                              'Calories: ${food.calories} | ${S.carbs()}: ${food.carbs}g | ${S.fat()}: ${food.fat}g | ${S.protein()}: ${food.protein}g',
                             ),
                             onTap: () {
-                              // Naviguer vers la page FoodDetailPage
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => FoodDetailPage(food: food, meal: '',),
+                                  builder: (context) => FoodDetailPage(food: food, meal: ''),
                                 ),
                               );
                             },

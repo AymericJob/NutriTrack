@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../Routes/app_routes.dart';
+import '../../l10n/intl_en.dart';
+
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -20,7 +22,7 @@ class LoginPage extends StatelessWidget {
     } catch (e) {
       String message;
       if (e is FirebaseAuthException) {
-        message = e.message ?? 'An error occurred during login';
+        message = e.message ?? S.loginErrorMessage();
       } else {
         message = 'An unexpected error occurred';
       }
@@ -32,13 +34,13 @@ class LoginPage extends StatelessWidget {
   void _resetPassword(BuildContext context) async {
     String email = _emailController.text.trim();
     if (email.isEmpty) {
-      _showMessage(context, "Please enter your email");
+      _showMessage(context, S.loginErrorMessage());
       return;
     }
 
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      _showMessage(context, "Password reset email sent. Please check your inbox.");
+      _showMessage(context, S.resetPasswordMessage());
     } catch (e) {
       String message;
       if (e is FirebaseAuthException) {
@@ -85,7 +87,7 @@ class LoginPage extends StatelessWidget {
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: 'Email',
+                        labelText: S.emailLabel(), // Traduction du label "Email"
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -97,7 +99,7 @@ class LoginPage extends StatelessWidget {
                     TextField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        labelText: S.passwordLabel(), // Traduction du label "Password"
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -117,7 +119,7 @@ class LoginPage extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                       ),
                       child: Text(
-                        'Login',
+                        S.loginButton(), // Traduction du bouton "Login"
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -129,7 +131,7 @@ class LoginPage extends StatelessWidget {
                     TextButton(
                       onPressed: () => _resetPassword(context),
                       child: Text(
-                        'Forgot Password?',
+                        S.forgotPassword(), // Traduction du texte "Forgot Password?"
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -139,7 +141,7 @@ class LoginPage extends StatelessWidget {
                         Navigator.of(context).pushReplacementNamed(AppRoutes.registerPage);
                       },
                       child: Text(
-                        'Don\'t have an account? Sign Up',
+                        S.signUpPrompt(), // Traduction du texte "Don’t have an account? Sign Up"
                         style: TextStyle(color: Colors.white),
                       ),
                     ),

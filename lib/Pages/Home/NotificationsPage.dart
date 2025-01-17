@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import '../../l10n/intl_en.dart';
+
 
 class NotificationsPage extends StatefulWidget {
   @override
@@ -20,8 +22,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
       if (message.notification != null) {
         setState(() {
           _notifications.add({
-            'title': message.notification!.title ?? 'No Title',
-            'body': message.notification!.body ?? 'No Content',
+            'title': message.notification!.title ?? S.noTitle(), // Traduction du titre
+            'body': message.notification!.body ?? S.noContent(), // Traduction du contenu
           });
         });
       }
@@ -32,11 +34,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: Text(S.notificationsTitle()), // Traduction du titre
         backgroundColor: Colors.blueAccent,
       ),
       body: _notifications.isEmpty
-          ? Center(child: Text('No notifications received'))
+          ? Center(child: Text(S.noNotifications())) // Traduction du message lorsqu'il n'y a pas de notifications
           : ListView.builder(
         itemCount: _notifications.length,
         itemBuilder: (context, index) {

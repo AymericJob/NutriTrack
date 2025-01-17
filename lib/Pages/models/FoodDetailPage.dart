@@ -3,7 +3,9 @@ import 'package:myfitnesspal/Pages/Home/main_page.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../l10n/intl_en.dart';
 import '../models/food.dart';
+
 
 class FoodDetailPage extends StatefulWidget {
   final Food food;
@@ -16,7 +18,7 @@ class FoodDetailPage extends StatefulWidget {
 
 class _FoodDetailPageState extends State<FoodDetailPage> {
   double _quantity = 1.0;
-  String _selectedMeal = "Petit-déjeuner"; // Repas par défaut
+  String _selectedMeal = "Breakfest"; // Repas par défaut
   DateTime _selectedDate = DateTime.now(); // Date par défaut (aujourd'hui)
 
   // Méthode pour calculer les valeurs nutritionnelles ajustées
@@ -44,7 +46,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Aliment ajouté avec succès !")),
+          SnackBar(content: Text(S.foodAddedSuccessfully())),
         );
 
         Navigator.pushReplacement(
@@ -53,12 +55,12 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur : utilisateur non authentifié.")),
+          SnackBar(content: Text(S.userNotAuthenticated())),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur lors de l'ajout de l'aliment.")),
+        SnackBar(content: Text(S.errorAddingFood())),
       );
       print("Erreur lors de l'ajout de l'aliment : $e");
     }
@@ -99,7 +101,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Détails de l'aliment",
+                S.foodDetailTitle(), // Traduction du titre "Food Details"
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -109,7 +111,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
               SizedBox(height: 20),
               // Quantité de l'aliment
               Text(
-                "Quantité (en portions) :",
+                S.quantityLabel(), // Traduction de "Quantity (in servings)"
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               TextField(
@@ -133,7 +135,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
               SizedBox(height: 20),
               // Sélection de repas
               Text(
-                "Sélectionnez un repas :",
+                S.mealSelectionLabel(), // Traduction de "Select a meal"
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               DropdownButton<String>(
@@ -144,10 +146,10 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   });
                 },
                 items: <String>[
-                  "Petit-déjeuner",
-                  "Déjeuner",
-                  "Dîner",
-                  "Collation"
+                  "Breakfest",
+                  "Lunch",
+                  "Diner",
+                  "Snack"
                 ].map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -163,14 +165,14 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
               SizedBox(height: 20),
               // Sélection de la date
               Text(
-                "Sélectionnez une date :",
+                S.dateSelectionLabel(), // Traduction de "Select a date"
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "${_selectedDate.toLocal()}".split(' ')[0],
+                    S.dateLabel(_selectedDate), // Traduction de la date sélectionnée
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -185,13 +187,13 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildProgressIndicator(
-                    "Calories",
+                    S.caloriesLabel(), // Traduction de "Calories"
                     _calculateValue(widget.food.calories),
                     2000, // AJR (Apports Journaliers Recommandés)
                     Colors.orange,
                   ),
                   _buildProgressIndicator(
-                    "Carbs",
+                    S.carbsLabel(), // Traduction de "Carbs"
                     _calculateValue(widget.food.carbs),
                     300, // AJR pour glucides
                     Colors.blue,
@@ -203,13 +205,13 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildProgressIndicator(
-                    "Graisses",
+                    S.fatsLabel(), // Traduction de "Fats"
                     _calculateValue(widget.food.fat),
                     70, // AJR pour graisses
                     Colors.red,
                   ),
                   _buildProgressIndicator(
-                    "Protéines",
+                    S.proteinLabel(), // Traduction de "Proteins"
                     _calculateValue(widget.food.protein),
                     50, // AJR pour protéines
                     Colors.green,
@@ -229,7 +231,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                     padding:
                     EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                   ),
-                  child: Text('Ajouter cet aliment',
+                  child: Text(S.addFoodButtonLabel(), // Traduction du bouton
                       style: TextStyle(fontSize: 18)),
                 ),
               ),

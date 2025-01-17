@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../Routes/app_routes.dart';
+import '../../l10n/intl_en.dart';
 
 class RegisterPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -21,7 +22,7 @@ class RegisterPage extends StatelessWidget {
 
     // Vérifier si les mots de passe correspondent
     if (password != confirmPassword) {
-      _showMessage(context, "Passwords do not match");
+      _showMessage(context, S.passwordsDoNotMatch());
       return;
     }
 
@@ -44,7 +45,7 @@ class RegisterPage extends StatelessWidget {
           });
 
           // Affichage d'un message de succès
-          _showMessage(context, "User created successfully in Firestore!");
+          _showMessage(context, S.userCreatedSuccessfully());
 
           // Redirection vers la page principale après l'inscription réussie
           Navigator.of(context).pushReplacementNamed(AppRoutes.mainPage);
@@ -54,7 +55,7 @@ class RegisterPage extends StatelessWidget {
       }
     } catch (e) {
       // En cas d'erreur d'inscription
-      String message = 'Registration failed: ';
+      String message = S.registrationFailed() + ': ';
       if (e is FirebaseAuthException) {
         message += e.message ?? 'Unknown error';
       } else {
@@ -97,7 +98,7 @@ class RegisterPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Sign Up',
+                      S.signUpLabel(), // Traduction du titre "Sign Up"
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -109,7 +110,7 @@ class RegisterPage extends StatelessWidget {
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: 'Email',
+                        labelText: S.emailLabel(), // Traduction du label "Email"
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -123,7 +124,7 @@ class RegisterPage extends StatelessWidget {
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        labelText: S.passwordLabel(), // Traduction du label "Password"
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -137,7 +138,7 @@ class RegisterPage extends StatelessWidget {
                       controller: _confirmPasswordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: 'Confirm Password',
+                        labelText: S.confirmPasswordLabel(), // Traduction du label "Confirm Password"
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -158,7 +159,7 @@ class RegisterPage extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                       ),
                       child: Text(
-                        'Sign Up',
+                        S.signUpButton(), // Traduction du bouton "Sign Up"
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -172,7 +173,7 @@ class RegisterPage extends StatelessWidget {
                         Navigator.of(context).pushNamed(AppRoutes.loginPage);
                       },
                       child: Text(
-                        'Already have an account? Sign In',
+                        S.signInPrompt(), // Traduction du texte "Already have an account? Sign In"
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
