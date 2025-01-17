@@ -67,7 +67,21 @@ Il existe de nombreuses applications de suivi de l'alimentation sur le marché, 
 
 ## 👀 Design de l'application
 
-TODO
+![1](https://github.com/user-attachments/assets/89217a42-256c-4105-9f29-da18adec76e4)
+![2](https://github.com/user-attachments/assets/967aebf3-3ae3-43f8-899d-0db57ec58095)
+![3](https://github.com/user-attachments/assets/a982c012-fd35-4990-b8c2-d28a43d6bf1c)
+![4](https://github.com/user-attachments/assets/3d46fd49-98a7-42d9-9e23-233505ac6ea5)
+![5](https://github.com/user-attachments/assets/a2e49826-6273-4b0e-a61f-6b0ac02f8e9e)
+![6](https://github.com/user-attachments/assets/52054826-b19d-4f35-845d-6fd0ac881168)
+![7](https://github.com/user-attachments/assets/60af4186-a820-43e0-9616-f04645f76ed3)
+![8](https://github.com/user-attachments/assets/ed2d5790-d263-4ed0-90b4-dbe8b155526a)
+![9](https://github.com/user-attachments/assets/8687cc10-1a4c-4ba1-99ff-b77559c5c175)
+![10](https://github.com/user-attachments/assets/d4a82042-212c-4619-8931-ec83b6d8e7b5)
+![11](https://github.com/user-attachments/assets/16665b63-ac94-4bed-a2dc-3114e528cdc3)
+![12](https://github.com/user-attachments/assets/b997c438-eb6d-4f8d-a369-165688deb62f)
+
+
+
 
 ## ⚙️ Fonctionnalités de l'application
 
