@@ -9,8 +9,7 @@ import '../models/food.dart';
 class FoodDetailPage extends StatefulWidget {
   final Food food;
 
-  const FoodDetailPage({Key? key, required this.food, required String meal})
-      : super(key: key);
+  const FoodDetailPage({Key? key, required this.food, required String meal}) : super(key: key);
 
   @override
   _FoodDetailPageState createState() => _FoodDetailPageState();
@@ -26,8 +25,8 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
     return (baseValue * _quantity).round();
   }
 
-  // Méthode pour ajouter ou mettre à jour l'aliment
-  Future<void> _saveFood() async {
+  // Méthode pour supprimer un aliment existant pour une date et un repas donnés
+  Future<void> _deleteExistingFood() async {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid != null) {
@@ -40,31 +39,53 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
         // Vérifie si un aliment existe déjà pour la date et le repas
         final query = await userFoodsRef
             .where('name', isEqualTo: widget.food.name)
-            .where('date', isEqualTo: Timestamp.fromDate(_selectedDate))
             .where('meal', isEqualTo: _selectedMeal)
             .get();
 
+        // Parcours des documents et vérifie la date pour supprimer le bon aliment
         if (query.docs.isNotEmpty) {
-          // Si un aliment existe, on le met à jour
-          final docId = query.docs.first.id;
-          await userFoodsRef.doc(docId).update({
-            'calories': FieldValue.increment(_calculateValue(widget.food.calories)),
-            'carbs': FieldValue.increment(_calculateValue(widget.food.carbs)),
-            'fat': FieldValue.increment(_calculateValue(widget.food.fat)),
-            'protein': FieldValue.increment(_calculateValue(widget.food.protein)),
-          });
-        } else {
-          // Sinon, on ajoute un nouvel aliment
-          await userFoodsRef.add({
-            'name': widget.food.name,
-            'calories': _calculateValue(widget.food.calories),
-            'carbs': _calculateValue(widget.food.carbs),
-            'fat': _calculateValue(widget.food.fat),
-            'protein': _calculateValue(widget.food.protein),
-            'meal': _selectedMeal,
-            'date': Timestamp.fromDate(_selectedDate),
-          });
+          for (var doc in query.docs) {
+            final foodDate = (doc['date'] as Timestamp).toDate();
+            // Si la date de l'aliment correspond à la date sélectionnée, on le supprime
+            if (foodDate.year == _selectedDate.year &&
+                foodDate.month == _selectedDate.month &&
+                foodDate.day == _selectedDate.day) {
+              // Suppression du document
+              await userFoodsRef.doc(doc.id).delete();
+              print("Aliment supprimé : ${doc.id}");  // Ajout d'un message de débogage
+            }
+          }
         }
+      }
+    } catch (e) {
+      print("Erreur lors de la suppression de l'aliment existant : $e");
+    }
+  }
+
+  // Méthode pour sauvegarder l'aliment (ajouter ou remplacer)
+  Future<void> _saveFood() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        // Référence au document utilisateur
+        final userFoodsRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('foods');
+
+        // 1. Supprimer l'aliment existant avant d'ajouter le nouveau
+        await _deleteExistingFood();
+
+        // 2. Ajouter l'aliment avec les nouvelles données
+        await userFoodsRef.add({
+          'name': widget.food.name,
+          'calories': _calculateValue(widget.food.calories),
+          'carbs': _calculateValue(widget.food.carbs),
+          'fat': _calculateValue(widget.food.fat),
+          'protein': _calculateValue(widget.food.protein),
+          'meal': _selectedMeal,
+          'date': Timestamp.fromDate(_selectedDate),
+        });
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(S.foodAddedSuccessfully())),
@@ -95,11 +116,10 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null && picked != _selectedDate)
       setState(() {
         _selectedDate = picked;
       });
-    }
   }
 
   @override
@@ -109,155 +129,157 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
         title: Text(widget.food.name),
         backgroundColor: Colors.blueAccent,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.grey.shade200],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: SingleChildScrollView(  // Ajout du widget pour activer le défilement
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.white, Colors.grey.shade200],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                S.foodDetailTitle(),
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  S.foodDetailTitle(), // Traduction du titre "Food Details"
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueAccent,
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              // Quantité de l'aliment
-              Text(
-                S.quantityLabel(),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              TextField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: "Entrez la quantité",
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  contentPadding:
-                  EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                SizedBox(height: 20),
+                // Quantité de l'aliment
+                Text(
+                  S.quantityLabel(), // Traduction de "Quantity (in servings)"
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    _quantity = double.tryParse(value) ?? 1.0;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              // Sélection de repas
-              Text(
-                S.mealSelectionLabel(),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              DropdownButton<String>(
-                value: _selectedMeal,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedMeal = newValue!;
-                  });
-                },
-                items: <String>[
-                  "Breakfast",
-                  "Lunch",
-                  "Diner",
-                  "Snack"
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                isExpanded: true,
-                underline: Container(
-                  height: 2,
-                  color: Colors.blueAccent,
-                ),
-              ),
-              SizedBox(height: 20),
-              // Sélection de la date
-              Text(
-                S.dateSelectionLabel(),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    S.dateLabel(_selectedDate),
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: () => _selectDate(context),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              // Progress indicators pour les nutriments
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildProgressIndicator(
-                    S.caloriesLabel(),
-                    _calculateValue(widget.food.calories),
-                    2000,
-                    Colors.orange,
-                  ),
-                  _buildProgressIndicator(
-                    S.carbsLabel(),
-                    _calculateValue(widget.food.carbs),
-                    300,
-                    Colors.blue,
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildProgressIndicator(
-                    S.fatsLabel(),
-                    _calculateValue(widget.food.fat),
-                    70,
-                    Colors.red,
-                  ),
-                  _buildProgressIndicator(
-                    S.proteinLabel(),
-                    _calculateValue(widget.food.protein),
-                    50,
-                    Colors.green,
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _saveFood,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
+                TextField(
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: "Entrez la quantité",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    padding:
-                    EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                    contentPadding:
+                    EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
-                  child: Text(S.addFoodButtonLabel(),
-                      style: TextStyle(fontSize: 18)),
+                  onChanged: (value) {
+                    setState(() {
+                      _quantity = double.tryParse(value) ?? 1.0;
+                    });
+                  },
                 ),
-              ),
-            ],
+                SizedBox(height: 20),
+                // Sélection de repas
+                Text(
+                  S.mealSelectionLabel(), // Traduction de "Select a meal"
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                DropdownButton<String>(
+                  value: _selectedMeal,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedMeal = newValue!;
+                    });
+                  },
+                  items: <String>[
+                    "Breakfast",
+                    "Lunch",
+                    "Diner",
+                    "Snack"
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  isExpanded: true,
+                  underline: Container(
+                    height: 2,
+                    color: Colors.blueAccent,
+                  ),
+                ),
+                SizedBox(height: 20),
+                // Sélection de la date
+                Text(
+                  S.dateSelectionLabel(), // Traduction de "Select a date"
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      S.dateLabel(_selectedDate), // Traduction de la date sélectionnée
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.calendar_today),
+                      onPressed: () => _selectDate(context),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                // Affichage des progress indicators
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildProgressIndicator(
+                      S.caloriesLabel(), // Traduction de "Calories"
+                      _calculateValue(widget.food.calories),
+                      2000, // AJR (Apports Journaliers Recommandés)
+                      Colors.orange,
+                    ),
+                    _buildProgressIndicator(
+                      S.carbsLabel(), // Traduction de "Carbs"
+                      _calculateValue(widget.food.carbs),
+                      300, // AJR pour glucides
+                      Colors.blue,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildProgressIndicator(
+                      S.fatsLabel(), // Traduction de "Fats"
+                      _calculateValue(widget.food.fat),
+                      70, // AJR pour graisses
+                      Colors.red,
+                    ),
+                    _buildProgressIndicator(
+                      S.proteinLabel(), // Traduction de "Proteins"
+                      _calculateValue(widget.food.protein),
+                      50, // AJR pour protéines
+                      Colors.green,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 30),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _saveFood,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding:
+                      EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                    ),
+                    child: Text(S.addFoodButtonLabel(), // Traduction du bouton
+                        style: TextStyle(fontSize: 18)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -272,7 +294,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
       child: Column(
         children: [
           CircularPercentIndicator(
-            radius: 80.0,
+            radius: 60.0,
             lineWidth: 10.0,
             percent: percentage,
             center: Text(
