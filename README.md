@@ -63,8 +63,7 @@ Il existe de nombreuses applications de suivi de l'alimentation sur le marché, 
 
 ## 📍 Site Map
 
-![Site_map drawio](https://github.com/user-attachments/assets/a1d399e9-20fb-4495-92cd-b3a6dd71d008)
-
+![Site_map drawio](https://github.com/user-attachments/assets/68ceeb89-9a13-4052-ad57-3f6592ad2cd3)
 
 ## 👀 Design de l'application
 
