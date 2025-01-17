@@ -18,7 +18,7 @@ class FoodDetailPage extends StatefulWidget {
 
 class _FoodDetailPageState extends State<FoodDetailPage> {
   double _quantity = 1.0;
-  String _selectedMeal = "Breakfest"; // Repas par défaut
+  String _selectedMeal = "Breakfast"; // Repas par défaut
   DateTime _selectedDate = DateTime.now(); // Date par défaut (aujourd'hui)
 
   // Méthode pour calculer les valeurs nutritionnelles ajustées
@@ -146,7 +146,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   });
                 },
                 items: <String>[
-                  "Breakfest",
+                  "breakfast",
                   "Lunch",
                   "Diner",
                   "Snack"

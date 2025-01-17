@@ -153,7 +153,7 @@ class _ManualSearchPageState extends State<ManualSearchPage> {
               DropdownButtonFormField<String>(
                 value: _selectedMeal,
                 decoration: InputDecoration(labelText: S.mealLabel()), // Traduction du label
-                items: ['Breakfest', 'Lunch', 'Diner', 'Snack']
+                items: ['Breakfast', 'Lunch', 'Diner', 'Snack']
                     .map((meal) => DropdownMenuItem<String>(
                   value: meal,
                   child: Text(meal),
