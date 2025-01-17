@@ -100,6 +100,8 @@ Tous les fichiers se trouvent dans le dossier `lib`.
     - `activity_page.dart` : Page principale reprenant les activités de l'utilisateur. 
     - `dashboard_page.dart` : Page de tableau de bord de l'utilisateur, résumant les informations importantes.
     - `main_page.dart` : Page principale du profil de l'utilisateur.
+    - 'settings_page.dart' : Page de paramètres de l'application.
+    - 'Notifications_page.dart' : Page de notifications pour les utilisateurs.
         - **Profile** :
             - `activity_tracking_page.dart` : La page concernant les activités de l'utilisateur.
             - `nutrition_goal_page.dart` : Page ou l'utilisateur peut définir ses objectifs nutritionnels.
@@ -122,18 +124,16 @@ Tous les fichiers se trouvent dans le dossier `lib`.
 - **main.dart** : Point d'entrée de l'application Flutter.
 - **TODO.txt** : Liste des tâches à accomplir et améliorations à apporter.
 
-## ⏳ État d'avancement
-- [ ] Voir dans la TODO page.
-
 ### Bugs à corriger
-- [ ] N/A
+- [ ] Catégories d'aliments ne subit pas l'internationalisation.
 
 ### Améliorations
-- [ ] Ajouter un système de notifications pour les utilisateurs concernant des objectifs de santé.
-- [ ] Intégrer des fonctionnalités de suivi des exercices physiques.
-- [ ] Ajouter la reconnaissance d’aliments par photo.
-- [ ] Améliorer la page add_food_page.dart pour une meilleure expérience utilisateur.
-- [ ] Intégrer des notifications push pour encourager les utilisateurs à rester actifs.
+- [ ] Intégrer des recettes et des plans de repas pour les utilisateurs.
+- [ ] Ajouter des fonctionnalités de partage social pour encourager l'engagement.
+- [ ] Ajouter des conseils et des astuces pour aider les utilisateurs à atteindre leurs objectifs.
+- [ ] Intégrer des fonctionnalités de coaching pour offrir un soutien personnalisé.
+- [ ] Intégrer une IA pour reconnaitre les aliments et les quantités à partir d'une photo.
+
 
 ## 💻 Technologies utilisées
 
