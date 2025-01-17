@@ -109,165 +109,171 @@ class _DashboardPageState extends State<DashboardPage> {
 
     Map<String, List<Food>> groupedFoods = _groupFoodsByMeal();
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Date et boutons de navigation
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.chevron_left),
-                  onPressed: () {
-                    setState(() {
-                      _selectedDate = _selectedDate.subtract(Duration(days: 1));
-                      _fetchFoodsForDate(_selectedDate);
-                    });
-                  },
-                ),
-                Text(
-                  DateFormat('d MMM yyyy').format(_selectedDate),
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: Icon(Icons.chevron_right),
-                  onPressed: () {
-                    setState(() {
-                      _selectedDate = _selectedDate.add(Duration(days: 1));
-                      _fetchFoodsForDate(_selectedDate);
-                    });
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-
-            // Section des macros
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildCircularProgressIndicator(
-                    S.calories(), totalCalories, _calorieGoal, Colors.red),
-                _buildCircularProgressIndicator(
-                    S.carbs(), totalCarbs, _carbsGoal, Colors.blue),
-                _buildCircularProgressIndicator(
-                    S.protein(), totalProtein, _proteinGoal, Colors.green),
-                _buildCircularProgressIndicator(
-                    S.fat(), totalFat, _fatGoal, Colors.orange),
-              ],
-            ),
-            SizedBox(height: 20),
-
-            // Aliments consommés par catégories
-            Text(
-              S.consumedFoods(),
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: ListView(
-                children: groupedFoods.entries.map((entry) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry.key,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                      ...entry.value.map((food) {
-                        return Dismissible(
-                          key: Key(food.id),
-                          background: Container(
-                            color: Colors.red,
-                            alignment: Alignment.centerRight,
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 20.0),
-                              child: Icon(Icons.delete, color: Colors.white),
-                            ),
-                          ),
-                          direction: DismissDirection.endToStart,
-                          onDismissed: (direction) async {
-                            String? uid = FirebaseAuth.instance.currentUser?.uid;
-                            if (uid != null) {
-                              try {
-                                await FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(uid)
-                                    .collection('foods')
-                                    .doc(food.id)
-                                    .delete();
-
-                                setState(() {
-                                  _foods.removeWhere((item) => item.id == food.id);
-                                });
-                              } catch (e) {
-                                print("Erreur lors de la suppression de l'aliment: $e");
-                              }
-                            }
-                          },
-                          child: ListTile(
-                            title: Text(food.name),
-                            subtitle: Text(
-                              'Calories: ${food.calories} | ${S.carbs()}: ${food.carbs}g | ${S.fat()}: ${food.fat}g | ${S.protein()}: ${food.protein}g',
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => FoodDetailPage(food: food, meal: ''),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ],
-                  );
-                }).toList(),
+    return WillPopScope(
+      onWillPop: () async {
+        // Empêche le retour en arrière via le bouton retour du téléphone
+        return false; // Retourne false pour désactiver le retour
+      },
+      child: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Date et boutons de navigation
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.chevron_left),
+                    onPressed: () {
+                      setState(() {
+                        _selectedDate = _selectedDate.subtract(Duration(days: 1));
+                        _fetchFoodsForDate(_selectedDate);
+                      });
+                    },
+                  ),
+                  Text(
+                    DateFormat('d MMM yyyy').format(_selectedDate),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.chevron_right),
+                    onPressed: () {
+                      setState(() {
+                        _selectedDate = _selectedDate.add(Duration(days: 1));
+                        _fetchFoodsForDate(_selectedDate);
+                      });
+                    },
+                  ),
+                ],
               ),
+              SizedBox(height: 20),
+
+              // Section des macros
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildCircularProgressIndicator(
+                      S.calories(), totalCalories, _calorieGoal, Colors.red),
+                  _buildCircularProgressIndicator(
+                      S.carbs(), totalCarbs, _carbsGoal, Colors.blue),
+                  _buildCircularProgressIndicator(
+                      S.protein(), totalProtein, _proteinGoal, Colors.green),
+                  _buildCircularProgressIndicator(
+                      S.fat(), totalFat, _fatGoal, Colors.orange),
+                ],
+              ),
+              SizedBox(height: 20),
+
+              // Aliments consommés par catégories
+              Text(
+                S.consumedFoods(),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Expanded(
+                child: ListView(
+                  children: groupedFoods.entries.map((entry) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          entry.key,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        ...entry.value.map((food) {
+                          return Dismissible(
+                            key: Key(food.id),
+                            background: Container(
+                              color: Colors.red,
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 20.0),
+                                child: Icon(Icons.delete, color: Colors.white),
+                              ),
+                            ),
+                            direction: DismissDirection.endToStart,
+                            onDismissed: (direction) async {
+                              String? uid = FirebaseAuth.instance.currentUser?.uid;
+                              if (uid != null) {
+                                try {
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(uid)
+                                      .collection('foods')
+                                      .doc(food.id)
+                                      .delete();
+
+                                  setState(() {
+                                    _foods.removeWhere((item) => item.id == food.id);
+                                  });
+                                } catch (e) {
+                                  print("Erreur lors de la suppression de l'aliment: $e");
+                                }
+                              }
+                            },
+                            child: ListTile(
+                              title: Text(food.name),
+                              subtitle: Text(
+                                'Calories: ${food.calories} | ${S.carbs()}: ${food.carbs}g | ${S.fat()}: ${food.fat}g | ${S.protein()}: ${food.protein}g',
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FoodDetailPage(food: food, meal: ''),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => JournalPage(foods: _foods),
+                  ),
+                );
+              },
+              child: Icon(Icons.pie_chart),
+              backgroundColor: Colors.green,
+            ),
+            SizedBox(height: 10),
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddFoodPage(onFoodAdded: (food) {
+                      setState(() {
+                        _foods.add(food);
+                      });
+                    }),
+                  ),
+                );
+              },
+              child: Icon(Icons.add),
+              backgroundColor: Colors.blue,
             ),
           ],
         ),
-      ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => JournalPage(foods: _foods),
-                ),
-              );
-            },
-            child: Icon(Icons.pie_chart),
-            backgroundColor: Colors.green,
-          ),
-          SizedBox(height: 10),
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddFoodPage(onFoodAdded: (food) {
-                    setState(() {
-                      _foods.add(food);
-                    });
-                  }),
-                ),
-              );
-            },
-            child: Icon(Icons.add),
-            backgroundColor: Colors.blue,
-          ),
-        ],
       ),
     );
   }

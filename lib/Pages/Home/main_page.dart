@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../l10n/intl_en.dart';
 import 'NotificationsPage.dart';
 import 'dashboard_page.dart';
-import 'activity_page.dart';
 import 'Profile/profile_page.dart';
 
 class MainPage extends StatefulWidget {
@@ -16,7 +15,6 @@ class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
     DashboardPage(),
-    ActivityPage(),
     ProfilePage(),
   ];
 
@@ -57,7 +55,8 @@ class _MainPageState extends State<MainPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(S.logOutTitle(), style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(S.logOutTitle(),
+              style: TextStyle(fontWeight: FontWeight.bold)),
           content: Text(S.logOutMessage()),
           actions: [
             TextButton(
@@ -76,28 +75,39 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(S.appTitle()),
-        backgroundColor: Colors.blueAccent,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => NotificationsPage(),
-                ),
-              );
-            },
-          ),
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        // Remplacer la flèche de retour pour ramener l'utilisateur sur le Dashboard
+        if (_selectedIndex != 0) {
+          setState(() {
+            _selectedIndex = 0; // Retour à la page du Dashboard
+          });
+        }
+        return false; // Empêche la fermeture de la page
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(S.appTitle()),
+          backgroundColor: Colors.blueAccent,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.notifications),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NotificationsPage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        drawer: _buildDrawer(context),
+        body: SafeArea(
+          child: _pages[_selectedIndex],
+        ),
+        bottomNavigationBar: _buildBottomNavigationBar(),
       ),
-      drawer: _buildDrawer(context),
-      body: SafeArea(
-        child: _pages[_selectedIndex],
-      ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -111,9 +121,15 @@ class _MainPageState extends State<MainPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(S.appTitle(), style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                Text(S.appTitle(),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
-                Text(S.welcomeMessage(FirebaseAuth.instance.currentUser?.email ?? 'User'),
+                Text(
+                    S.welcomeMessage(
+                        FirebaseAuth.instance.currentUser?.email ?? 'User'),
                     style: TextStyle(color: Colors.white70, fontSize: 16)),
               ],
             ),
@@ -170,21 +186,8 @@ class _MainPageState extends State<MainPage> {
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.white54,
       items: [
-        BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: S.Dashboard()),
         BottomNavigationBarItem(
-          icon: Stack(
-            children: [
-              Icon(Icons.fitness_center),
-              Positioned(
-                right: 0,
-                child: Container(
-                  padding: EdgeInsets.all(2),
-                ),
-              ),
-            ],
-          ),
-          label: S.Activity(),
-        ),
+            icon: Icon(Icons.dashboard), label: S.Dashboard()),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: S.Profile()),
       ],
     );

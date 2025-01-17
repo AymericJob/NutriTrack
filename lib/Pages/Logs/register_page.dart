@@ -67,120 +67,126 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade400, Colors.blueAccent],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+    return WillPopScope(
+      onWillPop: () async {
+        // Empêche la fermeture de la page avec le bouton retour physique
+        return false; // Retourne false pour désactiver le retour
+      },
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blue.shade400, Colors.blueAccent],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Stack(
-            children: [
-              // Flèche pour revenir à la page d'accueil
-              Positioned(
-                top: 16,
-                left: 16,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white, size: 30), // Flèche blanche
-                  onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/homepage'); // Remplacez '/homepage' par le nom de votre route home_page.
-                  },
+          child: SafeArea(
+            child: Stack(
+              children: [
+                // Flèche pour revenir à la page d'accueil
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: 30), // Flèche blanche
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed('/homepage'); // Remplacez '/homepage' par le nom de votre route home_page.
+                    },
+                  ),
                 ),
-              ),
-              // Contenu principal de la page
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      S.signUpLabel(), // Traduction du titre "Sign Up"
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: 40),
-                    // Champ email
-                    TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: S.emailLabel(), // Traduction du label "Email"
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    // Champ mot de passe
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: S.passwordLabel(), // Traduction du label "Password"
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    // Champ confirmation du mot de passe
-                    TextField(
-                      controller: _confirmPasswordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: S.confirmPasswordLabel(), // Traduction du label "Confirm Password"
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 40),
-                    // Bouton "Sign Up"
-                    ElevatedButton(
-                      onPressed: () => _register(context),
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.blue.shade700,
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                      ),
-                      child: Text(
-                        S.signUpButton(), // Traduction du bouton "Sign Up"
+                // Contenu principal de la page
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        S.signUpLabel(), // Traduction du titre "Sign Up"
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    // Bouton de redirection vers Sign In
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(AppRoutes.loginPage);
-                      },
-                      child: Text(
-                        S.signInPrompt(), // Traduction du texte "Already have an account? Sign In"
-                        style: TextStyle(color: Colors.white),
+                      SizedBox(height: 40),
+                      // Champ email
+                      TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: S.emailLabel(), // Traduction du label "Email"
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 20),
+                      // Champ mot de passe
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: S.passwordLabel(), // Traduction du label "Password"
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      // Champ confirmation du mot de passe
+                      TextField(
+                        controller: _confirmPasswordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: S.confirmPasswordLabel(), // Traduction du label "Confirm Password"
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 40),
+                      // Bouton "Sign Up"
+                      ElevatedButton(
+                        onPressed: () => _register(context),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.blue.shade700,
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                        ),
+                        child: Text(
+                          S.signUpButton(), // Traduction du bouton "Sign Up"
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      // Bouton de redirection vers Sign In
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(AppRoutes.loginPage);
+                        },
+                        child: Text(
+                          S.signInPrompt(), // Traduction du texte "Already have an account? Sign In"
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

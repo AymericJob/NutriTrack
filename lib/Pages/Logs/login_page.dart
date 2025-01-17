@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../Routes/app_routes.dart';
 import '../../l10n/intl_en.dart';
 
-
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -54,101 +53,107 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade400, Colors.blueAccent],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+    return WillPopScope(
+      onWillPop: () async {
+        // Empêche la fermeture de la page avec le bouton retour physique
+        return false; // Retourne false pour désactiver le retour
+      },
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blue.shade400, Colors.blueAccent],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Stack(
-            children: [
-              // Flèche pour revenir à la page d'accueil
-              Positioned(
-                top: 16,
-                left: 16,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white, size: 30), // Flèche blanche
-                  onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/homepage');
-                  },
+          child: SafeArea(
+            child: Stack(
+              children: [
+                // Flèche pour revenir à la page d'accueil
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: 30), // Flèche blanche
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed('/homepage');
+                    },
+                  ),
                 ),
-              ),
-              // Contenu principal de la page
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: S.emailLabel(), // Traduction du label "Email"
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
+                // Contenu principal de la page
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: S.emailLabel(), // Traduction du label "Email"
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: S.passwordLabel(), // Traduction du label "Password"
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: S.passwordLabel(), // Traduction du label "Password"
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        obscureText: true,
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () => _login(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                        ),
+                        child: Text(
+                          S.loginButton(), // Traduction du bouton "Login"
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade700,
+                          ),
                         ),
                       ),
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () => _login(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                      ),
-                      child: Text(
-                        S.loginButton(), // Traduction du bouton "Login"
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade700,
+                      SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () => _resetPassword(context),
+                        child: Text(
+                          S.forgotPassword(), // Traduction du texte "Forgot Password?"
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () => _resetPassword(context),
-                      child: Text(
-                        S.forgotPassword(), // Traduction du texte "Forgot Password?"
-                        style: TextStyle(color: Colors.white),
+                      SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pushReplacementNamed(AppRoutes.registerPage);
+                        },
+                        child: Text(
+                          S.signUpPrompt(), // Traduction du texte "Don’t have an account? Sign Up"
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pushReplacementNamed(AppRoutes.registerPage);
-                      },
-                      child: Text(
-                        S.signUpPrompt(), // Traduction du texte "Don’t have an account? Sign Up"
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

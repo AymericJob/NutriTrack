@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myfitnesspal/Pages/Home/dashboard_page.dart';
 import '../Pages/Home/SettingsPage.dart';
 import '../Pages/Logs/login_page.dart';
 import '../Pages/Logs/register_page.dart';
@@ -24,6 +25,9 @@ class AppRoutes {
   static const String nutritionGoalsPage = '/nutrition_goals';
   static const String activityTrackingPage = '/activity_tracking';
   static const String foodDetailsPage = '/food_details';
+  static const String Dashboard = '/dashboard';
+
+
 
   // Nouvelle route pour Settings
   static const String settingsPage = '/settings';  // Ajout de la nouvelle route
@@ -40,6 +44,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => RegisterPage());
       case mainPage:
         return MaterialPageRoute(builder: (_) => MainPage());
+        case Dashboard:
+        return MaterialPageRoute(builder: (_) => DashboardPage());
 
     // Nouvelles routes pour le profil
       case profilePage:
